@@ -486,8 +486,9 @@ p + p { margin-top: 1em; }
 .site-footer { border-top: 1px solid var(--gold-deep); padding: 2rem 0 3rem; color: var(--label); font-size: var(--t-label); }
 .site-footer p { max-width: 60ch; }
 
+/* Less motion: everything stops except the crest draw-in, which is small, stays in place and runs once. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  *:not(.draw *), *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 </style>
 </head>
