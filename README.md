@@ -92,7 +92,7 @@ Each change can carry a tag: New, Now baseline, Moved, Improved, Toned down, Mix
 After changing a crest or the site title, rebuild the image:
 
 ```
-node tools/make-og.js "C:Program FilesGoogleChromeApplicationchrome.exe"
+node tools/make-og.js "C:/Program Files/Google/Chrome/Application/chrome.exe"
 ```
 
 ## Open questions for Skyy
