@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forever Class Guide</title>
+<meta name="description" content="All nine WoW Forever classes and 27 specs from Skyy's class picking guide, with a short quiz to help you choose.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+/* ================================================================
+   FOREVER CLASS GUIDE
+   A class trainer's field manual. Built for someone reading on
+   their own, often on a phone: navigation and reading come first,
+   decoration last. Type and rules do the work.
+   ================================================================ */
+
+:root {
+  /* Palette carried over from the gear tool */
+  --gold-bright: #ffd644;
+  --gold-mid: #c9a84c;
+  --gold-dim: #8b7340;
+  --gold-dark: #5c4a2a;
+  --gold-deep: #3d3220;
+  --panel-bg: #0c0a07;
+  --panel-inner: #12100b;
+  --leather: #1a1610;
+  --text: #e6d9b8;
+  --label: #b8ad93;
+
+  /* One accent per page. Class pages override these two. */
+  --class: var(--gold-mid);
+  --class-text: var(--gold-bright);
+
+  --font-display: 'Uncial Antiqua', 'Palatino Linotype', serif;
+  --font-body: 'Crimson Pro', Georgia, serif;
+
+  /* Type scale: six steps */
+  --t-class: clamp(2.4rem, 9vw, 3.6rem);
+  --t-section: 1.7rem;
+  --t-spec: 2.1rem;
+  --t-term: 1.15rem;
+  --t-body: 1.125rem;
+  --t-label: 1rem;
+
+  --header-h: 3rem;
+  --measure: 66ch;
+  --gutter: 1rem;
+}
+
+@media (min-width: 900px) {
+  :root { --t-body: 1.1875rem; --t-section: 1.9rem; --t-spec: 2.4rem; --header-h: 3.5rem; --gutter: 2rem; }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: 1.6;
+  color: var(--text);
+  min-height: 100vh;
+  background:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E") repeat,
+    var(--panel-bg);
+}
+
+a { color: inherit; }
+ul, ol { list-style: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; border-radius: 2px; }
+[tabindex="-1"]:focus { outline: none; }
+
+.wrap { width: min(70rem, 100% - var(--gutter) * 2); margin-inline: auto; }
+
+.skip {
+  position: absolute; left: var(--gutter); top: -4rem; z-index: 50;
+  padding: .5rem 1rem; background: var(--gold-bright); color: #1a1408; font-weight: 600;
+}
+.skip:focus { top: .5rem; }
+
+/* ---------------- Header ---------------- */
+
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  height: var(--header-h);
+  background: var(--panel-inner);
+  border-bottom: 1px solid var(--gold-dark);
+}
+.site-header .wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+
+.site-name {
+  font-family: var(--font-display);
+  font-size: clamp(.9rem, 4.4vw, 1.05rem);
+  color: var(--gold-bright);
+  text-decoration: none;
+  white-space: nowrap;
+  min-height: 44px; display: inline-flex; align-items: center;
+}
+
+.site-nav { display: flex; align-items: center; margin-right: -.6rem; }
+.site-nav a, .site-nav button {
+  min-height: 44px; padding: 0 .6rem;
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: var(--t-label); font-weight: 600;
+  text-decoration: none; white-space: nowrap;
+}
+.site-nav a:hover, .site-nav button:hover { color: var(--gold-bright); }
+.site-nav .chev { width: .6rem; height: .6rem; transition: transform .2s; }
+.site-nav [aria-expanded="true"] .chev { transform: rotate(180deg); }
+.only-wide { display: none; }
+@media (min-width: 480px) { .only-wide { display: inline; } .only-narrow { display: none; } }
+
+/* ---------------- Classes menu ---------------- */
+
+.menu {
+  position: fixed; inset: var(--header-h) 0 0 0; z-index: 25;
+  background: var(--panel-inner);
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 1rem 0 3rem;
+  animation: sheet .2s ease-out;
+}
+.menu[hidden] { display: none; }
+@keyframes sheet { from { opacity: 0; transform: translateY(-.5rem); } }
+
+.menu-list { display: grid; grid-template-columns: 1fr; }
+.menu-class { padding: .5rem 0; border-bottom: 1px solid var(--gold-deep); }
+.menu-class > a {
+  display: flex; align-items: center; gap: .75rem;
+  min-height: 48px;
+  font-family: var(--font-display); font-size: 1.3rem;
+  color: var(--class-text); text-decoration: none;
+}
+.menu-class .crest { width: 2rem; height: 2rem; color: var(--class); flex: none; }
+.menu-specs { display: flex; flex-wrap: wrap; column-gap: .25rem; padding-left: 2.75rem; }
+.menu-specs a {
+  min-height: 44px; padding: 0 .75rem 0 0; display: inline-flex; align-items: center;
+  color: var(--text); text-underline-offset: .2em; text-decoration-color: var(--gold-dim);
+}
+.menu-specs a:hover { color: var(--gold-bright); }
+.menu-foot { margin-top: 1.5rem; }
+
+@media (min-width: 900px) {
+  .menu { inset: var(--header-h) 0 auto 0; max-height: calc(100vh - var(--header-h)); border-bottom: 1px solid var(--gold-dark); padding: 1.5rem 0 2rem; }
+  .menu-list { grid-template-columns: repeat(3, 1fr); column-gap: 3rem; }
+  .scrim { position: fixed; inset: var(--header-h) 0 0 0; z-index: 20; background: rgba(0, 0, 0, .6); }
+}
+.scrim[hidden] { display: none; }
+
+/* ---------------- Shared ---------------- */
+
+main { padding-bottom: 5rem; }
+main.enter { animation: enter .15s ease-out; }
+@keyframes enter { from { opacity: 0; } }
+
+p + p { margin-top: 1em; }
+.measure { max-width: var(--measure); }
+
+.notice {
+  margin-top: 1.5rem; padding: .75rem 1rem;
+  border-left: 3px solid var(--gold-mid); background: var(--leather);
+}
+
+.text-link { color: var(--gold-bright); text-underline-offset: .2em; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 1.25rem;
+  border: 1px solid var(--gold-dim);
+  font-weight: 600; text-decoration: none;
+}
+.btn:hover { border-color: var(--gold-bright); color: var(--gold-bright); }
+
+/* ---------------- Home ---------------- */
+
+.masthead { padding: 2.5rem 0 2rem; }
+.masthead h1 { font-size: clamp(2rem, 7vw, 3.2rem); line-height: 1.1; font-weight: 600; max-width: 18ch; letter-spacing: -.01em; }
+.masthead p { margin-top: 1rem; color: var(--label); max-width: 52ch; }
+
+.start { border-top: 1px solid var(--gold-dim); border-bottom: 1px solid var(--gold-dark); padding: 1.5rem 0; }
+.start-grid { display: grid; gap: 1rem; }
+.start h2 { font-size: var(--t-section); line-height: 1.2; font-weight: 600; }
+.start p { color: var(--label); }
+.start-options { display: grid; gap: .5rem; }
+@media (min-width: 900px) {
+  .start-grid { grid-template-columns: 5fr 7fr; gap: 3rem; align-items: center; }
+}
+
+.option {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  min-height: 52px; padding: .6rem 1rem;
+  border: 1px solid var(--gold-dark); background: var(--leather);
+  text-decoration: none; font-weight: 500;
+}
+.option:hover { border-color: var(--gold-bright); }
+.option.quiet { background: none; border-style: dashed; color: var(--label); }
+
+.roster-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; padding: 2.5rem 0 1rem; }
+.roster-head h2 { font-size: var(--t-section); font-weight: 600; line-height: 1.2; }
+
+.filter { display: flex; flex-wrap: wrap; gap: .25rem; }
+.filter button {
+  min-height: 44px; padding: 0 .9rem;
+  border: 1px solid var(--gold-deep); font-size: var(--t-label);
+}
+.filter button:hover { border-color: var(--gold-dim); }
+.filter button[aria-pressed="true"] { border-color: var(--gold-bright); color: var(--gold-bright); background: var(--leather); }
+
+.roster { border-top: 1px solid var(--gold-dark); }
+.roster-row {
+  position: relative;
+  display: grid; grid-template-columns: 3rem 1fr; column-gap: 1rem; row-gap: .25rem;
+  padding: 1.1rem 0 .6rem;
+  border-bottom: 1px solid var(--gold-deep);
+  transition: opacity .15s;
+}
+.roster-row.dim { opacity: .35; }
+.roster-row .crest { width: 3rem; height: 3rem; color: var(--class); grid-row: span 2; }
+.roster-name {
+  font-family: var(--font-display); font-size: 1.6rem; line-height: 1.2;
+  color: var(--class-text); text-decoration: none;
+}
+/* the whole upper part of the row is the tap target for the class */
+.roster-name::after { content: ''; position: absolute; inset: 0 0 3.2rem 0; }
+.roster-row:hover .roster-name { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+.roster-roles { color: var(--label); font-size: var(--t-label); }
+.roster-pitch { grid-column: 2; max-width: 56ch; }
+.roster-specs { grid-column: 1 / -1; position: relative; z-index: 1; display: flex; flex-wrap: wrap; column-gap: 1.25rem; padding-left: 4rem; }
+.roster-specs a {
+  min-height: 44px; display: inline-flex; align-items: center;
+  color: var(--text); text-underline-offset: .2em; text-decoration-color: var(--gold-dim);
+}
+.roster-specs a:hover { color: var(--gold-bright); }
+
+@media (min-width: 900px) {
+  .roster-row { grid-template-columns: 3.5rem 15rem 1fr; column-gap: 1.5rem; align-items: start; padding: 1.4rem 0 .8rem; }
+  .roster-row .crest { width: 3.5rem; height: 3.5rem; grid-row: span 2; }
+  .roster-id { grid-column: 2; grid-row: span 2; }
+  .roster-pitch { grid-column: 3; }
+  .roster-specs { grid-column: 3; padding-left: 0; }
+  .roster-name::after { inset: 0 0 3.4rem 0; }
+}
+
+/* ---------------- Class page ---------------- */
+
+.class-layout { display: block; }
+
+.section-nav {
+  position: sticky; top: var(--header-h); z-index: 10;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--gold-deep);
+  margin-inline: calc(var(--gutter) * -1);
+}
+.section-nav ul { display: flex; overflow-x: auto; scrollbar-width: none; padding-inline: var(--gutter); }
+.section-nav ul::-webkit-scrollbar { display: none; }
+.section-nav a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  padding: 0 .85rem; white-space: nowrap;
+  font-size: var(--t-label); color: var(--label); text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.section-nav li:first-child a { padding-left: 0; }
+.section-nav a:hover { color: var(--text); }
+.section-nav a[aria-current="true"] { color: var(--class-text); border-color: var(--class); }
+.section-nav .nav-gap { width: 1px; background: var(--gold-deep); margin: .7rem .4rem; flex: none; }
+
+.class-body section, .class-body header { scroll-margin-top: calc(var(--header-h) + 3.5rem); }
+
+.class-head { padding: 2rem 0 0; }
+.class-head .crest { width: 4.5rem; height: 4.5rem; color: var(--class); display: block; margin-bottom: .75rem; }
+.class-head h1 { font-family: var(--font-display); font-size: var(--t-class); line-height: 1.05; font-weight: 400; color: var(--class-text); }
+.class-roles { margin-top: .4rem; color: var(--label); }
+.lead { margin-top: 1.5rem; font-size: 1.3rem; line-height: 1.5; max-width: 60ch; }
+
+.class-body h2 { font-size: var(--t-section); line-height: 1.2; font-weight: 600; margin-bottom: 1rem; }
+.class-body section { padding-top: 3rem; }
+
+.who-block { border-left: 3px solid var(--class); padding-left: 1.25rem; max-width: var(--measure); }
+
+.ledger { display: grid; gap: 2rem; }
+.ledger h3 { font-size: var(--t-term); font-weight: 700; padding-bottom: .5rem; border-bottom: 1px solid var(--gold-dim); }
+.ledger li { padding: .8rem 0; border-bottom: 1px solid var(--gold-deep); }
+.ledger strong { display: block; font-weight: 600; color: var(--gold-bright); }
+.ledger .against strong { color: var(--text); }
+@media (min-width: 700px) { .ledger { grid-template-columns: 1fr 1fr; gap: 3rem; } }
+
+.terms { max-width: var(--measure); }
+.terms dt { font-size: var(--t-term); font-weight: 700; line-height: 1.3; color: var(--gold-bright); }
+.terms dd { margin-top: .2rem; }
+.terms dd + dt { margin-top: 1.4rem; }
+
+.spec { border-top: 1px solid var(--gold-dim); margin-top: 3.5rem; }
+.class-body .spec { padding-top: 2rem; }
+.spec-head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 1rem; margin-bottom: 1rem; }
+.class-body .spec h2 { font-size: var(--t-spec); line-height: 1.1; margin-bottom: 0; }
+.spec-role { color: var(--label); }
+.spec-intro { max-width: var(--measure); }
+.spec h3 { font-size: var(--t-term); font-weight: 600; color: var(--label); margin: 2rem 0 1rem; }
+
+.note { max-width: var(--measure); margin-top: 2rem; padding: 1rem 1.25rem; background: var(--leather); }
+.note-label { display: block; font-weight: 700; margin-bottom: .25rem; }
+.note.take { border-left: 3px solid var(--gold-mid); font-style: italic; }
+.note.take .note-label { font-style: normal; color: var(--gold-bright); }
+.note.open { border: 1px dashed var(--gold-dim); }
+
+.closing { border-top: 1px solid var(--gold-dim); margin-top: 3.5rem; }
+.closing p { max-width: var(--measure); }
+
+.pager { display: grid; gap: .5rem; margin-top: 3rem; }
+.pager a {
+  display: flex; flex-direction: column; justify-content: center;
+  min-height: 64px; padding: .6rem 1rem;
+  border: 1px solid var(--gold-dark); text-decoration: none;
+}
+.pager a:hover { border-color: var(--gold-bright); }
+.pager small { color: var(--label); font-size: var(--t-label); }
+.pager b { font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; color: var(--class-text); }
+.pager .all b { font-family: var(--font-body); font-weight: 600; font-size: inherit; color: var(--text); }
+@media (min-width: 700px) {
+  .pager { grid-template-columns: 1fr 1fr 1fr; }
+  .pager .next { text-align: right; }
+  .pager .all { text-align: center; grid-column: 2; grid-row: 1; }
+  .pager .prev { grid-column: 1; grid-row: 1; }
+}
+
+@media (min-width: 900px) {
+  .class-layout { display: grid; grid-template-columns: 13rem minmax(0, 1fr); column-gap: 4rem; align-items: start; }
+  .section-nav {
+    top: calc(var(--header-h) + 2rem);
+    margin: 2.5rem 0 0; background: none; border-bottom: 0;
+  }
+  .section-nav ul { flex-direction: column; overflow: visible; padding: 0; }
+  .section-nav a {
+    width: 100%; white-space: normal; padding: 0 0 0 1rem;
+    border-bottom: 0; border-left: 2px solid var(--gold-deep);
+  }
+  .section-nav li:first-child a { padding-left: 1rem; }
+  .section-nav .nav-gap { width: auto; height: 1rem; background: none; margin: 0; border-left: 2px solid var(--gold-deep); }
+  .class-body section, .class-body header { scroll-margin-top: calc(var(--header-h) + 1.5rem); }
+  .class-head { padding-top: 2.5rem; }
+}
+
+/* ---------------- Quiz ---------------- */
+
+.quiz { max-width: 40rem; padding-top: 2rem; }
+.quiz-count { color: var(--label); }
+.progress { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: .6rem 0 2rem; }
+.progress i { height: 4px; background: var(--gold-deep); }
+.progress i.done { background: var(--gold-mid); }
+.progress i.now { background: var(--gold-bright); }
+.quiz h1 { font-size: clamp(1.8rem, 6vw, 2.4rem); line-height: 1.15; font-weight: 600; margin-bottom: 1.5rem; }
+.quiz-options { display: grid; gap: .5rem; }
+.quiz-foot { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; }
+.quiz-foot a { min-height: 44px; display: inline-flex; align-items: center; color: var(--label); text-underline-offset: .2em; }
+.quiz-foot a:hover { color: var(--gold-bright); }
+
+/* ---------------- Results ---------------- */
+
+.results { padding-top: 2rem; }
+.results h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.1; font-weight: 600; }
+.results > p { margin-top: .75rem; color: var(--label); max-width: 52ch; }
+
+.podium { margin-top: 2rem; border-top: 1px solid var(--gold-dim); counter-reset: rank; }
+.match {
+  display: grid; grid-template-columns: 3rem 1fr; column-gap: 1rem;
+  padding: 1.5rem 0; border-bottom: 1px solid var(--gold-deep);
+}
+.match .crest { width: 3rem; height: 3rem; color: var(--class); }
+.match-title { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 1rem; }
+.match h2 { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; line-height: 1.2; color: var(--class-text); }
+.match-score { font-weight: 700; color: var(--gold-bright); white-space: nowrap; }
+.match-role { color: var(--label); }
+.match ul { margin: .75rem 0; max-width: 56ch; }
+.match li { padding-left: 1.1rem; position: relative; }
+.match li::before { content: ''; position: absolute; left: 0; top: .72em; width: .45rem; height: 1px; background: var(--gold-mid); }
+.match .text-link { min-height: 44px; display: inline-flex; align-items: center; }
+@media (min-width: 900px) { .match { grid-template-columns: 3.5rem 1fr; column-gap: 1.5rem; } .match .crest { width: 3.5rem; height: 3.5rem; } }
+
+.ranking { margin-top: 2rem; }
+.ranking summary { min-height: 48px; display: inline-flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--gold-bright); }
+.ranking ol { margin-top: .5rem; border-top: 1px solid var(--gold-dark); }
+.ranking li { border-bottom: 1px solid var(--gold-deep); }
+.ranking a { display: flex; justify-content: space-between; gap: 1rem; min-height: 48px; align-items: center; text-decoration: none; }
+.ranking a:hover { color: var(--gold-bright); }
+.ranking span:last-child { color: var(--label); font-variant-numeric: tabular-nums; }
+
+.results-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 2rem; }
+.share-url { width: 100%; margin-top: .75rem; min-height: 44px; padding: 0 .75rem; font: inherit; color: var(--text); background: var(--leather); border: 1px solid var(--gold-dark); }
+.share-url[hidden] { display: none; }
+
+/* ---------------- Footer ---------------- */
+
+.site-footer { border-top: 1px solid var(--gold-deep); padding: 2rem 0 3rem; color: var(--label); font-size: var(--t-label); }
+.site-footer p { max-width: 60ch; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#app">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="site-name" href="#/">Forever Class Guide</a>
+    <nav class="site-nav" aria-label="Site">
+      <button type="button" id="menuBtn" aria-expanded="false" aria-controls="menu">Classes
+        <svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+      <a href="#/quiz"><span class="only-wide">Take the quiz</span><span class="only-narrow">Quiz</span></a>
+    </nav>
+  </div>
+</header>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="All classes and specs" hidden></div>
+
+<main id="app" tabindex="-1"></main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Written by Skyy of The Comeback Kids, from the WoW Forever class picking guide. This is a fan-made site and is not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment.</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="quiz.js"></script>
+<script>
+'use strict';
+
+/* ================================================================
+   RENDER CORE
+   ================================================================ */
+
+const SITE = 'Forever Class Guide';
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const paras = list => list.map(p => `<p>${esc(p)}</p>`).join('');
+const accent = c => `style="--class:${c.color};--class-text:${c.text}"`;
+
+// Sections every class page has, before its three specs.
+const SECTIONS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'who', label: 'Who it\'s for' },
+  { id: 'strengths', label: 'Strengths and weaknesses' },
+  { id: 'changes', label: 'What changed' }
+];
+
+const ROLE_WORDS = { tank: 'Tank', healer: 'Healer', melee: 'Melee damage', ranged: 'Ranged damage' };
+const rolesOf = c => ['tank', 'healer', 'melee', 'ranged'].filter(r => c.specs.some(s => s.roles.includes(r)));
+const roleLine = c => {
+  const words = rolesOf(c).map(r => ROLE_WORDS[r]);
+  return words.map((w, i) => (i ? w.toLowerCase() : w)).join(', ');
+};
+
+// Original line drawings, one stroke weight, drawn inside a shared ring.
+const CREST_ART = {
+  paladin: '<path d="M16 14h16v8H16zM24 22v17M21 39h6"/><path d="M24 5v4M13.5 8.5l2 3M34.5 8.5l-2 3M8 17l3.5 1M40 17l-3.5 1"/>',
+  druid: '<path d="M24 23c-5 0-9.5 4.5-9.5 9 0 3.500 3.500 4.500 9.500 4.500s9.500-1 9.500-4.500c0-4.500-4.500-9-9.500-9z"/><ellipse cx="13.500" cy="20" rx="2.600" ry="3.600"/><ellipse cx="20" cy="13.500" rx="2.600" ry="3.600"/><ellipse cx="28" cy="13.500" rx="2.600" ry="3.600"/><ellipse cx="34.500" cy="20" rx="2.600" ry="3.600"/>',
+  priest: '<ellipse cx="24" cy="10.500" rx="8" ry="2.600"/><circle cx="24" cy="20" r="4.500"/><path d="M13 39c0-7.500 4.500-12 11-12s11 4.500 11 12"/><path d="M24 27c6.500 0 11 4.500 11 12H24z" fill="currentColor" fill-opacity=".3" stroke="none"/><path d="M24 27v12"/>',
+  hunter: '<path d="M17 7c13 7 13 27 0 34"/><path d="M17 7v34M9 24h30M39 24l-5-3.500M39 24l-5 3.500M9 24l3.500-3M9 24l3.500 3"/>',
+  rogue: '<path d="M13 35l22-24v5L17 35zM11 29l8 8M13 35l-4 4"/><path d="M35 35L13 11v5l18 19zM37 29l-8 8M35 35l4 4"/>',
+  mage: '<circle cx="24" cy="24" r="13"/><path d="M24 11l11.300 19.500H12.700z"/><circle cx="24" cy="24" r="3.500"/><path d="M24 5v3M7.500 33.500l2.600-1.500M40.500 33.500l-2.600-1.500"/>',
+  warlock: '<path d="M24 8c4.500 6.500 9 10 9 17a9 9 0 0 1-18 0c0-4.500 2-7 4.500-10 1 3.500 2 5 3.500 5 1.500-3.500 1.500-7 1-12z"/><path d="M24 27c2 2.500 3.500 4 3.500 6a3.500 3.500 0 0 1-7 0c0-2 1.500-3.500 3.500-6z"/><path d="M11 14l4 3M37 14l-4 3M14 40h20"/>',
+  warrior: '<path d="M24 7l13 4.500v11c0 8.500-5.500 14-13 17.500-7.500-3.500-13-9-13-17.500v-11z"/><path d="M17 16l14 14M31 16L17 30M17 16v3.500M17 16h3.500M31 16v3.500M31 16h-3.500"/>',
+  shaman: '<path d="M27 5L15.500 23.500h7.500L20 34l12.500-16.500H25z"/><path d="M8 40c3-2.500 5-2.500 8 0s5 2.500 8 0 5-2.500 8 0 5 2.500 8 0"/>'
+};
+const crest = c => `<svg class="crest" viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.500" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="22.500" stroke-width="1"/><g transform="translate(24 24) scale(.9) translate(-24 -24)">${CREST_ART[c.id]}</g></svg>`;
+
+/* ================================================================
+   VIEWS
+   ================================================================ */
+
+let roleFilter = 'all';
+
+function renderHome(route) {
+  const q = QUESTIONS[0];
+  const firstStep = i => {
+    const a = QUESTIONS.map(() => null);
+    a[0] = i;
+    return `#/quiz?a=${encodeAnswers(a)}`;
+  };
+  return `
+  <div class="wrap">
+    ${route.notFound ? '<p class="notice" role="status">That page does not exist. Here is the full list of classes.</p>' : ''}
+    <div class="masthead">
+      <h1 tabindex="-1">Which class should you play in WoW Forever?</h1>
+      <p>All nine classes and 27 specs from Skyy's guide, laid out so you can flip straight to the one you're curious about.</p>
+    </div>
+
+    <section class="start" aria-labelledby="startTitle">
+      <div class="start-grid">
+        <div>
+          <h2 id="startTitle">${esc(q.prompt)}</h2>
+          <p>Pick one to start the quiz. Seven questions, then your three best matches.</p>
+        </div>
+        <div class="start-options">
+          ${q.options.map((o, i) => `<a class="option" href="${firstStep(i + 1)}">${esc(o.label)}</a>`).join('')}
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="rosterTitle">
+      <div class="roster-head">
+        <h2 id="rosterTitle">The nine classes</h2>
+        <div class="filter" role="group" aria-label="Highlight classes by role">
+          ${['all', 'tank', 'healer', 'melee', 'ranged'].map(r => `<button type="button" data-role="${r}" aria-pressed="${r === roleFilter}">${r === 'all' ? 'All' : ROLE_WORDS[r].replace(' damage', '')}</button>`).join('')}
+        </div>
+      </div>
+      <ul class="roster">
+        ${CLASSES.map(c => `
+        <li class="roster-row${roleFilter !== 'all' && !rolesOf(c).includes(roleFilter) ? ' dim' : ''}" data-roles="${rolesOf(c).join(' ')}" ${accent(c)}>
+          ${crest(c)}
+          <div class="roster-id">
+            <a class="roster-name" href="#/${c.id}">${esc(c.name)}</a>
+            <div class="roster-roles">${esc(roleLine(c))}</div>
+          </div>
+          <p class="roster-pitch">${esc(c.pitch)}</p>
+          <div class="roster-specs">
+            ${c.specs.map(s => `<a href="#/${c.id}/${s.id}">${esc(s.name)}</a>`).join('')}
+          </div>
+        </li>`).join('')}
+      </ul>
+    </section>
+  </div>`;
+}
+
+const termList = rows => `<dl class="terms">${rows.map(r => `<dt>${esc(r.term)}</dt><dd>${esc(r.text)}</dd>`).join('')}</dl>`;
+
+function renderClass(route) {
+  const c = route.cls;
+  const i = CLASSES.indexOf(c);
+  const prev = CLASSES[(i + CLASSES.length - 1) % CLASSES.length];
+  const next = CLASSES[(i + 1) % CLASSES.length];
+  const link = id => `#/${c.id}/${id}`;
+
+  return `
+  <div class="wrap class-layout" data-class="${c.id}" ${accent(c)}>
+    <nav class="section-nav" aria-label="${esc(c.name)} sections">
+      <ul>
+        ${SECTIONS.map(s => `<li><a href="${link(s.id)}" data-section="${s.id}">${esc(s.label)}</a></li>`).join('')}
+        <li class="nav-gap" aria-hidden="true"></li>
+        ${c.specs.map(s => `<li><a href="${link(s.id)}" data-section="${s.id}">${esc(s.name)}</a></li>`).join('')}
+      </ul>
+    </nav>
+
+    <article class="class-body">
+      <header class="class-head" id="overview" data-spy>
+        ${crest(c)}
+        <h1 tabindex="-1">${esc(c.name)}</h1>
+        <p class="class-roles">${esc(roleLine(c))}</p>
+        <p class="lead">${esc(c.summary)}</p>
+      </header>
+
+      <section id="who" data-spy>
+        <h2 tabindex="-1">Who it's for</h2>
+        <div class="who-block">${paras(c.idealPlayer)}</div>
+      </section>
+
+      <section id="strengths" data-spy>
+        <h2 tabindex="-1">Strengths and weaknesses</h2>
+        <div class="ledger">
+          <div>
+            <h3>Strengths</h3>
+            <ul>${c.strengths.map(r => `<li><strong>${esc(r.lead)}</strong>${esc(r.text)}</li>`).join('')}</ul>
+          </div>
+          <div class="against">
+            <h3>Weaknesses</h3>
+            <ul>${c.weaknesses.map(r => `<li><strong>${esc(r.lead)}</strong>${esc(r.text)}</li>`).join('')}</ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="changes" data-spy>
+        <h2 tabindex="-1">What changed from Classic</h2>
+        ${termList(c.changes)}
+      </section>
+
+      ${c.specs.map(s => `
+      <section class="spec" id="${s.id}" data-spy>
+        <div class="spec-head">
+          <h2 tabindex="-1">${esc(s.name)}</h2>
+          <span class="spec-role">${esc(s.role)}</span>
+        </div>
+        <div class="spec-intro">${paras(s.intro)}</div>
+        <h3>Biggest changes</h3>
+        ${termList(s.changes)}
+        ${s.take ? `<aside class="note take"><span class="note-label">Skyy's take</span>${esc(s.take)}</aside>` : ''}
+        ${s.unconfirmed ? `<aside class="note open"><span class="note-label">Not confirmed yet</span>${esc(s.unconfirmed)}</aside>` : ''}
+      </section>`).join('')}
+
+      <section class="closing">
+        <h2>Is ${esc(c.name)} for you?</h2>
+        ${paras(c.outro)}
+      </section>
+
+      <nav class="pager" aria-label="More classes">
+        <a class="prev" href="#/${prev.id}" ${accent(prev)}><small>Previous class</small><b>${esc(prev.name)}</b></a>
+        <a class="all" href="#/"><small>Back to</small><b>All nine classes</b></a>
+        <a class="next" href="#/${next.id}" ${accent(next)}><small>Next class</small><b>${esc(next.name)}</b></a>
+      </nav>
+    </article>
+  </div>`;
+}
+
+function renderQuiz(route) {
+  const answers = route.answers;
+  let at = answers.findIndex(a => a === null);
+  if (at === -1) at = QUESTIONS.length - 1;
+  const q = QUESTIONS[at];
+
+  const withAnswer = (value) => {
+    const a = answers.slice();
+    a[at] = value;
+    const done = a.every(x => x !== null);
+    return `#/${done ? 'results' : 'quiz'}?a=${encodeAnswers(a)}`;
+  };
+  const back = () => {
+    const a = answers.slice();
+    a[at] = null;
+    a[at - 1] = null;
+    return `#/quiz?a=${encodeAnswers(a)}`;
+  };
+
+  return `
+  <div class="wrap">
+    <div class="quiz">
+      <p class="quiz-count">Question ${at + 1} of ${QUESTIONS.length}</p>
+      <div class="progress" aria-hidden="true">${QUESTIONS.map((x, i) => `<i class="${i < at ? 'done' : i === at ? 'now' : ''}"></i>`).join('')}</div>
+      <h1 tabindex="-1">${esc(q.prompt)}</h1>
+      <div class="quiz-options">
+        ${q.options.map((o, i) => `<a class="option" href="${withAnswer(i + 1)}">${esc(o.label)}</a>`).join('')}
+        <a class="option quiet" href="${withAnswer(0)}">No preference</a>
+      </div>
+      <div class="quiz-foot">
+        ${at > 0 ? `<a href="${back()}">Back to question ${at}</a>` : '<span></span>'}
+        <a href="#/">Leave the quiz</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderResults(route) {
+  const answers = route.answers;
+  const ranked = scoreQuiz(answers, CLASSES);
+  const answered = answers.some(a => a);
+  const byId = id => CLASSES.find(c => c.id === id);
+
+  const top = answered ? ranked.slice(0, 3) : [];
+  return `
+  <div class="wrap">
+    <div class="results">
+      <h1 tabindex="-1">${answered ? 'Your three best matches' : 'No preference on anything'}</h1>
+      <p>${answered
+        ? 'Scored against all 27 specs. Read the one that sounds right, then check the others. The quiz is a starting point, not a verdict.'
+        : 'You skipped every question, so every spec ties. Retake the quiz and answer at least one, or browse all nine classes.'}</p>
+
+      ${top.length ? `<ol class="podium">
+        ${top.map(r => `
+        <li class="match" ${accent(byId(r.classId))}>
+          ${crest(byId(r.classId))}
+          <div>
+            <div class="match-title">
+              <h2>${esc(r.specName)} ${esc(r.className)}</h2>
+              <span class="match-score">${r.score}% match</span>
+            </div>
+            <div class="match-role">${esc(r.role)}</div>
+            ${r.reasons.length ? `<ul>${r.reasons.slice(0, 3).map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+            <a class="text-link" href="#/${r.classId}/${r.specId}">Read about ${esc(r.specName)} ${esc(r.className)}</a>
+          </div>
+        </li>`).join('')}
+      </ol>` : ''}
+
+      ${answered ? `<details class="ranking">
+        <summary>See how all 27 specs scored</summary>
+        <ol>
+          ${ranked.map(r => `<li><a href="#/${r.classId}/${r.specId}"><span>${esc(r.specName)} ${esc(r.className)}</span><span>${r.score}%</span></a></li>`).join('')}
+        </ol>
+      </details>` : ''}
+
+      <div class="results-actions">
+        ${answered ? '<button type="button" class="btn" id="copyBtn">Copy link to these results</button>' : ''}
+        <a class="btn" href="#/quiz">Retake the quiz</a>
+        <a class="btn" href="#/">All nine classes</a>
+      </div>
+      <input class="share-url" id="shareUrl" readonly hidden aria-label="Link to these results">
+    </div>
+  </div>`;
+}
+
+function renderMenu() {
+  return `
+  <div class="wrap">
+    <ul class="menu-list">
+      ${CLASSES.map(c => `
+      <li class="menu-class" ${accent(c)}>
+        <a href="#/${c.id}">${crest(c)}${esc(c.name)}</a>
+        <div class="menu-specs">${c.specs.map(s => `<a href="#/${c.id}/${s.id}">${esc(s.name)}</a>`).join('')}</div>
+      </li>`).join('')}
+    </ul>
+    <div class="menu-foot"><a class="btn" href="#/quiz">Take the quiz</a></div>
+  </div>`;
+}
+
+/* ================================================================
+   ROUTER
+   ================================================================ */
+
+const app = document.getElementById('app');
+
+function parseRoute(hash) {
+  const raw = (hash || '').replace(/^#\/?/, '');
+  const [path, query = ''] = raw.split('?');
+  const parts = path.split('/').filter(Boolean);
+  const a = new URLSearchParams(query).get('a');
+
+  if (!parts.length) return { view: 'home' };
+  if (parts[0] === 'quiz' && parts.length === 1) return { view: 'quiz', answers: parseAnswers(a) };
+  if (parts[0] === 'results' && parts.length === 1) return { view: 'results', answers: parseAnswers(a) };
+
+  const cls = CLASSES.find(c => c.id === parts[0]);
+  if (cls && parts.length <= 2) {
+    const ids = SECTIONS.map(s => s.id).concat(cls.specs.map(s => s.id));
+    if (!parts[1] || ids.includes(parts[1])) return { view: 'class', cls, section: parts[1] || null };
+  }
+  return { view: 'home', notFound: true };
+}
+
+const VIEWS = {
+  home: { render: renderHome, title: () => SITE },
+  class: { render: renderClass, title: r => `${r.cls.name} | ${SITE}` },
+  quiz: { render: renderQuiz, title: () => `Quiz | ${SITE}` },
+  results: { render: renderResults, title: () => `Your matches | ${SITE}` }
+};
+
+let current = null;       // the route on screen
+let spy = null;           // scroll listener for the section nav
+let firstPaint = true;
+
+function sectionTitle(route) {
+  if (!route.section || route.section === 'overview') return route.cls.name;
+  const spec = route.cls.specs.find(s => s.id === route.section);
+  if (spec) return `${spec.name} ${route.cls.name}`;
+  return `${route.cls.name}: ${SECTIONS.find(s => s.id === route.section).label}`;
+}
+
+// opts.restore: a scroll position to return to (back and forward buttons)
+function render(opts = {}) {
+  const route = parseRoute(location.hash);
+  const samePage = current && current.view === 'class' && route.view === 'class' && current.cls === route.cls;
+
+  if (!samePage) {
+    app.innerHTML = VIEWS[route.view].render(route);
+    if (!firstPaint) {
+      app.classList.remove('enter');
+      void app.offsetWidth;
+      app.classList.add('enter');
+    }
+    if (route.view === 'class') watchSections(); else stopWatching();
+  }
+  document.title = route.view === 'class' ? `${sectionTitle(route)} | ${SITE}` : VIEWS[route.view].title(route);
+  closeMenu(false);
+
+  const target = route.view === 'class' && route.section && route.section !== 'overview'
+    ? document.getElementById(route.section) : null;
+
+  if (opts.restore != null) {
+    window.scrollTo(0, opts.restore);
+  } else if (target) {
+    target.scrollIntoView({ behavior: samePage && !reducedMotion() ? 'smooth' : 'auto', block: 'start' });
+    if (!firstPaint) focusQuietly(target.querySelector('h2'));
+  } else {
+    window.scrollTo(0, 0);
+    if (!firstPaint) focusQuietly(app.querySelector('h1'));
+  }
+
+  current = route;
+  firstPaint = false;
+}
+
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const focusQuietly = el => { if (el) el.focus({ preventScroll: true }); };
+
+/* ---------------- History: links push, back and forward restore scroll ---------------- */
+
+const scrollMemo = new Map();
+const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+let entryId = (history.state && history.state.id) || newId();
+
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+history.replaceState({ id: entryId }, '', location.href);
+
+function go(href) {
+  if (href === location.hash) { render(); return; }
+  scrollMemo.set(entryId, window.scrollY);
+  entryId = newId();
+  history.pushState({ id: entryId }, '', href);
+  render();
+}
+
+window.addEventListener('popstate', e => {
+  scrollMemo.set(entryId, window.scrollY);
+  if (e.state && e.state.id) {
+    entryId = e.state.id;
+    render({ restore: scrollMemo.has(entryId) ? scrollMemo.get(entryId) : null });
+  } else {
+    // hash typed or pasted by hand
+    entryId = newId();
+    history.replaceState({ id: entryId }, '', location.href);
+    render();
+  }
+});
+
+document.addEventListener('click', e => {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const a = e.target.closest('a[href^="#/"]');
+  if (a) { e.preventDefault(); go(a.getAttribute('href')); return; }
+
+  const roleBtn = e.target.closest('.filter button');
+  if (roleBtn) { setRoleFilter(roleBtn.dataset.role); return; }
+
+  if (e.target.closest('#copyBtn')) copyResults();
+});
+
+/* ---------------- Home: role filter ---------------- */
+
+function setRoleFilter(role) {
+  roleFilter = role;
+  document.querySelectorAll('.filter button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.role === role)));
+  document.querySelectorAll('.roster-row').forEach(row => {
+    row.classList.toggle('dim', role !== 'all' && !row.dataset.roles.split(' ').includes(role));
+  });
+}
+
+/* ---------------- Class page: mark the section being read ---------------- */
+
+function watchSections() {
+  stopWatching();
+  const links = new Map([...document.querySelectorAll('.section-nav a')].map(a => [a.dataset.section, a]));
+  const strip = document.querySelector('.section-nav ul');
+  const mark = id => {
+    links.forEach((a, key) => {
+      if (key === id) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+    });
+    const a = links.get(id);
+    // keep the current item in view on phones, without moving the page
+    if (a && strip.scrollWidth > strip.clientWidth) {
+      strip.scrollTo({ left: a.offsetLeft - strip.clientWidth / 2 + a.offsetWidth / 2, behavior: reducedMotion() ? 'auto' : 'smooth' });
+    }
+  };
+  const sections = [...document.querySelectorAll('[data-spy]')];
+  let marked = null;
+  // the section being read is the last one whose top has passed the upper third of the screen
+  spy = () => {
+    const line = window.innerHeight * .33;
+    let now = sections[0];
+    for (const s of sections) if (s.getBoundingClientRect().top <= line) now = s;
+    if (now.id !== marked) { marked = now.id; mark(marked); }
+  };
+  window.addEventListener('scroll', spy, { passive: true });
+  window.addEventListener('resize', spy);
+  spy();
+}
+function stopWatching() {
+  if (!spy) return;
+  window.removeEventListener('scroll', spy);
+  window.removeEventListener('resize', spy);
+  spy = null;
+}
+
+/* ---------------- Results: copy link ---------------- */
+
+function copyResults() {
+  const btn = document.getElementById('copyBtn');
+  const done = () => { btn.textContent = 'Link copied'; setTimeout(() => { btn.textContent = 'Copy link to these results'; }, 2500); };
+  const fallback = () => {
+    const input = document.getElementById('shareUrl');
+    input.hidden = false;
+    input.value = location.href;
+    input.focus();
+    input.select();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(location.href).then(done, fallback);
+  else fallback();
+}
+
+/* ---------------- Classes menu ---------------- */
+
+const menu = document.getElementById('menu');
+const menuBtn = document.getElementById('menuBtn');
+const scrim = document.getElementById('scrim');
+menu.innerHTML = renderMenu();
+
+function openMenu() {
+  menu.hidden = false;
+  scrim.hidden = false;
+  menuBtn.setAttribute('aria-expanded', 'true');
+  document.documentElement.style.overflow = 'hidden';
+  menu.scrollTop = 0;
+  focusQuietly(menu.querySelector('a'));
+}
+function closeMenu(returnFocus = true) {
+  if (menu.hidden) return;
+  menu.hidden = true;
+  scrim.hidden = true;
+  menuBtn.setAttribute('aria-expanded', 'false');
+  document.documentElement.style.overflow = '';
+  if (returnFocus) menuBtn.focus();
+}
+
+menuBtn.addEventListener('click', () => (menu.hidden ? openMenu() : closeMenu()));
+scrim.addEventListener('click', () => closeMenu());
+
+document.addEventListener('keydown', e => {
+  if (menu.hidden) return;
+  if (e.key === 'Escape') { closeMenu(); return; }
+  if (e.key !== 'Tab') return;
+  // keep focus inside the open menu, with the Classes button as part of the loop
+  const stops = [menuBtn, ...menu.querySelectorAll('a')];
+  const first = stops[0], last = stops[stops.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  else if (!stops.includes(document.activeElement)) { e.preventDefault(); first.focus(); }
+});
+
+/* ---------------- Init ---------------- */
+
+render();
+</script>
+</body>
+</html>
