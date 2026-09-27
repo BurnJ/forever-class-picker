@@ -78,7 +78,7 @@ Question weights: role 3, range 2, pet 2, fantasy 2, complexity 1.5, support 1, 
 
 ## Open questions for Skyy
 
-- **Druid weaknesses.** The script's Druid weaknesses are the same lines as Paladin's, including "A stun can stop some dangerous casts". They are on the site as written. Send replacements if they were a paste slip.
+- **Druid weaknesses.** The script's Druid weaknesses were the same lines as Paladin's, so the four on the site were written for the site, not by Skyy. Two lean on the script (mana, and bear versus cat tradeoffs). The other two assume Classic rules still hold in Forever: that you cannot cast while in Bear or Cat Form, and that shapeshifting costs mana. Correct them in `data.js` if Forever changes either.
 - **Traps in combat** (Survival) and **an Enhancement taunt** are shown on the site as not confirmed.
 
 ## Deploy
