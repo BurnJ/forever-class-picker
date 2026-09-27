@@ -87,6 +87,14 @@ Each class page links to its chapter of the video. The start times are in `VIDEO
 
 Each change can carry a tag: New, Now baseline, Moved, Improved, Toned down, Mixed or Unchanged. **The tags are a reading of Skyy's text, not something Skyy assigned.** Changes with no clear direction have no tag. Edit the `tag` field in `data.js` to correct one.
 
+## Capstones
+
+A change with `capstone: true` in `data.js` leads its spec and gets a featured panel. Thirteen are marked, each one the script calls a capstone or the big button at the bottom of a tree.
+
+## Footage slot
+
+On wide screens each class header has a 16:9 plate showing the class mark (`.plate` in `index.html`, with `data-media` set to the class id). It is there so a still or a muted video loop from the video footage can replace the mark later.
+
 ## Share image
 
 After changing a crest or the site title, rebuild the image:

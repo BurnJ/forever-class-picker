@@ -19,7 +19,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Almendra:wght@700&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <script defer src="/_vercel/insights/script.js"></script>
 <style>
 /* ================================================================
@@ -46,7 +46,7 @@
   --class: var(--gold-mid);
   --class-text: var(--gold-bright);
 
-  --font-display: 'Uncial Antiqua', 'Palatino Linotype', serif;
+  --font-display: 'Almendra', 'Palatino Linotype', serif;
   --font-body: 'Crimson Pro', Georgia, serif;
 
   /* Type scale: six steps */
@@ -107,7 +107,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .site-header .wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
 
 .site-name {
-  font-family: var(--font-display);
+  font-family: var(--font-display); font-weight: 700;
   font-size: clamp(.9rem, 4.4vw, 1.05rem);
   color: var(--gold-bright);
   text-decoration: none;
@@ -145,7 +145,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .menu-class > a {
   display: flex; align-items: center; gap: .75rem;
   min-height: 48px;
-  font-family: var(--font-display); font-size: 1.3rem;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.3rem;
   color: var(--class-text); text-decoration: none;
 }
 .menu-class .crest { width: 2rem; height: 2rem; color: var(--class); flex: none; }
@@ -196,13 +196,16 @@ p + p { margin-top: 1em; }
 .masthead h1 { font-size: clamp(2rem, 7vw, 3.2rem); line-height: 1.1; font-weight: 600; max-width: 18ch; letter-spacing: -.01em; }
 .masthead p { margin-top: 1rem; color: var(--label); max-width: 52ch; }
 
-.start { border-top: 1px solid var(--gold-dim); border-bottom: 1px solid var(--gold-dark); padding: 1.5rem 0; }
+/* The quiz starts on the home page. On wide screens it sits beside the title. */
+.start { border: 1px solid var(--gold-dark); background: var(--panel-inner); padding: 1.25rem; }
 .start-grid { display: grid; gap: 1rem; }
 .start h2 { font-size: var(--t-section); line-height: 1.2; font-weight: 600; }
 .start p { color: var(--label); }
 .start-options { display: grid; gap: .5rem; }
+.start-more { margin-top: 1rem; }
 @media (min-width: 900px) {
-  .start-grid { grid-template-columns: 5fr 7fr; gap: 3rem; align-items: center; }
+  .home-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 4rem; align-items: center; padding: 1.5rem 0 1rem; }
+  .start { padding: 1.75rem; }
 }
 
 .option {
@@ -236,7 +239,7 @@ p + p { margin-top: 1em; }
 .roster-row.dim { opacity: .35; }
 .roster-row .crest { width: 3rem; height: 3rem; color: var(--class); grid-row: span 2; }
 .roster-name {
-  font-family: var(--font-display); font-size: 1.6rem; line-height: 1.2;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; line-height: 1.2;
   color: var(--class-text); text-decoration: none;
 }
 /* the whole upper part of the row is the tap target for the class */
@@ -284,31 +287,57 @@ p + p { margin-top: 1em; }
 .section-nav a[aria-current="true"] { color: var(--class-text); border-color: var(--class); }
 .section-nav .nav-gap { width: 1px; background: var(--gold-deep); margin: .7rem .4rem; flex: none; }
 
-.class-body section, .class-body header { scroll-margin-top: calc(var(--header-h) + 3.5rem); }
+.class-body section { scroll-margin-top: calc(var(--header-h) + 3.5rem); }
 
-.class-head { padding: 2rem 0 0; position: relative; isolation: isolate; overflow: hidden; }
-.class-head .crest { width: 4.5rem; height: 4.5rem; color: var(--class); display: block; margin-bottom: .75rem; }
-
-/* the class mark, large and faint, behind the class name */
-.motif {
-  position: absolute; z-index: -1; right: -2rem; top: .5rem;
-  width: 15rem; height: 15rem;
-  color: var(--class); opacity: .09; pointer-events: none;
+/* The header band is tinted with the class color, edge to edge. */
+.class-head {
+  position: relative; isolation: isolate; overflow: hidden;
+  padding: 2rem 0 2.25rem;
+  background: color-mix(in srgb, var(--class) 9%, var(--panel-bg));
+  border-bottom: 1px solid color-mix(in srgb, var(--class) 40%, var(--panel-bg));
 }
-@media (min-width: 900px) { .motif { width: 24rem; height: 24rem; right: 0; top: 0; } }
+.class-head .crest { width: 4.5rem; height: 4.5rem; color: var(--class); display: block; margin-bottom: .75rem; }
+.head-grid { display: grid; gap: 1.5rem; }
+
+/* The plate holds the class mark today. It is sized 16:9 so a still or a video loop can replace the mark later. */
+.plate { position: absolute; z-index: -1; right: -2rem; top: .5rem; width: 15rem; pointer-events: none; }
+.plate .motif { display: block; width: 100%; height: auto; color: var(--class); opacity: .13; }
+
+.head-specs { border-top: 1px solid color-mix(in srgb, var(--class) 40%, var(--panel-bg)); }
+.head-specs a {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+  min-height: 48px; padding: .6rem 0; align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--class) 22%, var(--panel-bg));
+  text-decoration: none;
+}
+.head-specs b { font-size: var(--t-term); font-weight: 700; color: var(--class-text); }
+.head-specs span { color: var(--label); text-align: right; }
+.head-specs a:hover b { text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+
+@media (min-width: 900px) {
+  .class-head { padding: 3rem 0; }
+  .head-grid { grid-template-columns: minmax(0, 1fr) 22rem; column-gap: 4rem; align-items: start; }
+  .plate {
+    position: static; width: auto; aspect-ratio: 16 / 9; margin-bottom: 1.25rem;
+    display: grid; place-items: center; overflow: hidden;
+    background: color-mix(in srgb, var(--class) 7%, var(--panel-bg));
+    border: 1px solid color-mix(in srgb, var(--class) 40%, var(--panel-bg));
+  }
+  .plate .motif { width: 46%; opacity: .55; }
+}
 
 /* the one entrance: the crest draws itself when a class page opens */
-.crest.draw [pathLength] { stroke-dasharray: 1; animation: draw 1s ease-out both; }
-.crest.draw g [pathLength] { animation-delay: .25s; }
-.crest.draw [fill="currentColor"] { animation: enter .4s ease-out .9s both; }
+.crest.draw [pathLength] { stroke-dasharray: 1; animation: draw 1s ease-out both, fillin .5s ease-out .9s both; }
+.crest.draw g [pathLength] { animation-delay: .25s, 1.1s; }
 @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes fillin { from { fill-opacity: 0; } }
 
 .watch {
-  display: inline-flex; align-items: center; gap: .75rem;
-  min-height: 52px; margin-top: 1.5rem; padding: .5rem 1.1rem .5rem .9rem;
-  border: 1px solid var(--gold-dim); text-decoration: none; line-height: 1.3;
+  display: flex; align-items: center; gap: .75rem;
+  min-height: 52px; margin-top: 1.25rem; padding: .5rem 1.1rem .5rem .9rem;
+  border: 1px solid color-mix(in srgb, var(--class) 40%, var(--panel-bg)); text-decoration: none; line-height: 1.3;
 }
-.watch:hover { border-color: var(--gold-bright); }
+.watch:hover { border-color: var(--class-text); }
 .watch svg { width: 1.6rem; height: 1.6rem; flex: none; color: var(--class-text); }
 .watch b { display: block; font-weight: 600; }
 .watch small { color: var(--label); font-size: var(--t-label); }
@@ -319,14 +348,14 @@ p + p { margin-top: 1em; }
   font-size: .85rem; font-weight: 600; line-height: 1.5; white-space: nowrap;
   color: var(--label); vertical-align: .08em;
 }
-.tag-new { color: var(--gold-bright); border-color: var(--gold-dim); }
+.tag-new { color: var(--text); border-color: var(--gold-dim); }
 .tag-nerf { color: #ff9a8a; border-color: #7a3a30; }
 
 .spec-more { margin-top: 1.5rem; }
 .spec-more a { min-height: 44px; display: inline-flex; align-items: center; }
-.class-head h1 { font-family: var(--font-display); font-size: var(--t-class); line-height: 1.05; font-weight: 400; color: var(--class-text); }
+.class-head h1 { font-family: var(--font-display); font-size: var(--t-class); line-height: 1.05; font-weight: 700; color: var(--class-text); }
 .class-roles { margin-top: .4rem; color: var(--label); }
-.lead { margin-top: 1.5rem; font-size: 1.3rem; line-height: 1.5; max-width: 60ch; }
+.lead { margin-top: 1.25rem; font-size: 1.3rem; line-height: 1.5; max-width: 60ch; }
 
 .class-body h2 { font-size: var(--t-section); line-height: 1.2; font-weight: 600; margin-bottom: 1rem; }
 .class-body section { padding-top: 3rem; }
@@ -334,30 +363,47 @@ p + p { margin-top: 1em; }
 .who-block { border-left: 3px solid var(--class); padding-left: 1.25rem; max-width: var(--measure); }
 
 .ledger { display: grid; gap: 2rem; }
-.ledger h3 { font-size: var(--t-term); font-weight: 700; padding-bottom: .5rem; border-bottom: 1px solid var(--gold-dim); }
+.ledger h3 { font-size: var(--t-term); font-weight: 700; padding-bottom: .5rem; border-bottom: 2px solid var(--class); }
+.ledger .against h3 { border-bottom-color: var(--gold-dark); }
 .ledger li { padding: .8rem 0; border-bottom: 1px solid var(--gold-deep); }
-.ledger strong { display: block; font-weight: 600; color: var(--gold-bright); }
-.ledger .against strong { color: var(--text); }
+.ledger strong { display: block; font-weight: 700; }
 @media (min-width: 700px) { .ledger { grid-template-columns: 1fr 1fr; gap: 3rem; } }
 
-.terms { max-width: var(--measure); }
-.terms dt { font-size: var(--t-term); font-weight: 700; line-height: 1.3; color: var(--gold-bright); }
-.terms dd { margin-top: .2rem; }
-.terms dd + dt { margin-top: 1.4rem; }
+/* Changes: a ruled list, two columns when there is room. */
+.terms { display: grid; column-gap: 3rem; border-bottom: 1px solid var(--gold-deep); }
+.term { padding: .9rem 0 1rem; border-top: 1px solid var(--gold-deep); }
+.terms dt { font-size: var(--t-term); font-weight: 700; line-height: 1.3; color: var(--class-text); }
+.terms dd { margin-top: .2rem; max-width: var(--measure); }
+@media (min-width: 1100px) { .terms { grid-template-columns: 1fr 1fr; } }
 
-.spec { border-top: 1px solid var(--gold-dim); margin-top: 3.5rem; }
+/* A capstone is the biggest change in a spec, so it gets the full width and its own panel. */
+.term.capstone {
+  grid-column: 1 / -1;
+  margin: 0 0 .75rem; padding: 1.1rem 1.25rem 1.25rem;
+  background: color-mix(in srgb, var(--class) 8%, var(--panel-bg));
+  border: 1px solid color-mix(in srgb, var(--class) 45%, var(--panel-bg));
+  border-left-width: 3px; border-left-color: var(--class);
+}
+.capstone-label { display: block; color: var(--label); font-size: var(--t-label); margin-bottom: .15rem; }
+.term.capstone dt { font-size: 1.45rem; }
+.term.capstone dd { font-size: 1.2rem; line-height: 1.55; }
+
+.spec { border-top: 2px solid var(--class); margin-top: 3.5rem; }
 .class-body .spec { padding-top: 2rem; }
 .spec-head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 1rem; margin-bottom: 1rem; }
-.class-body .spec h2 { font-size: var(--t-spec); line-height: 1.1; margin-bottom: 0; }
+.class-body .spec h2 { font-size: var(--t-spec); line-height: 1.1; margin-bottom: 0; color: var(--class-text); }
 .spec-role { color: var(--label); }
 .spec-intro { max-width: var(--measure); }
-.spec h3 { font-size: var(--t-term); font-weight: 600; color: var(--label); margin: 2rem 0 1rem; }
+.spec h3 { font-size: var(--t-term); font-weight: 600; color: var(--label); margin: 2rem 0 .75rem; }
 
 .note { max-width: var(--measure); margin-top: 2rem; padding: 1rem 1.25rem; background: var(--leather); }
 .note-label { display: block; font-weight: 700; margin-bottom: .25rem; }
-.note.take { border-left: 3px solid var(--gold-mid); font-style: italic; }
-.note.take .note-label { font-style: normal; color: var(--gold-bright); }
 .note.open { border: 1px dashed var(--gold-dim); }
+
+/* Skyy's own opinion, set as a quote so it reads as a voice and not as another change. */
+.take { max-width: 38rem; margin-top: 2.5rem; padding-left: 1.5rem; border-left: 3px solid var(--class); }
+.take p { font-size: 1.35rem; line-height: 1.45; font-style: italic; }
+.take footer { margin-top: .6rem; color: var(--label); font-size: var(--t-label); }
 
 .closing { border-top: 1px solid var(--gold-dim); margin-top: 3.5rem; }
 .closing p { max-width: var(--measure); }
@@ -370,7 +416,7 @@ p + p { margin-top: 1em; }
 }
 .pager a:hover { border-color: var(--gold-bright); }
 .pager small { color: var(--label); font-size: var(--t-label); }
-.pager b { font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; color: var(--class-text); }
+.pager b { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; color: var(--class-text); }
 .pager .all b { font-family: var(--font-body); font-weight: 600; font-size: inherit; color: var(--text); }
 @media (min-width: 700px) {
   .pager { grid-template-columns: 1fr 1fr 1fr; }
@@ -392,8 +438,8 @@ p + p { margin-top: 1em; }
   }
   .section-nav li:first-child a { padding-left: 1rem; }
   .section-nav .nav-gap { width: auto; height: 1rem; background: none; margin: 0; border-left: 2px solid var(--gold-deep); }
-  .class-body section, .class-body header { scroll-margin-top: calc(var(--header-h) + 1.5rem); }
-  .class-head { padding-top: 2.5rem; }
+  .class-body section { scroll-margin-top: calc(var(--header-h) + 1.5rem); }
+  .class-body > section:first-child { padding-top: 2.5rem; }
 }
 
 /* ---------------- Quiz ---------------- */
@@ -416,16 +462,38 @@ p + p { margin-top: 1em; }
 .results h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.1; font-weight: 600; }
 .results > p { margin-top: .75rem; color: var(--label); max-width: 52ch; }
 
-.podium { margin-top: 2rem; border-top: 1px solid var(--gold-dim); counter-reset: rank; }
+.podium { margin-top: 2rem; display: grid; gap: 1rem; }
 .match {
   display: grid; grid-template-columns: 3rem 1fr; column-gap: 1rem;
-  padding: 1.5rem 0; border-bottom: 1px solid var(--gold-deep);
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--class) 35%, var(--panel-bg));
 }
 .match .crest { width: 3rem; height: 3rem; color: var(--class); }
 .match-title { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 1rem; }
-.match h2 { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; line-height: 1.2; color: var(--class-text); }
-.match-score { font-weight: 700; color: var(--gold-bright); white-space: nowrap; }
+.match h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; line-height: 1.2; color: var(--class-text); }
+.match-score { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .match-role { color: var(--label); }
+.match-rank { display: block; color: var(--label); font-size: var(--t-label); }
+
+.meter { height: 6px; margin: .6rem 0 .25rem; background: var(--gold-deep); }
+.meter i { display: block; height: 100%; background: var(--class); }
+
+/* the best match is the payoff of the quiz, so it is the largest thing on the page */
+.match.first {
+  grid-template-columns: 1fr; padding: 1.5rem 1.25rem;
+  background: color-mix(in srgb, var(--class) 9%, var(--panel-bg));
+  border-color: color-mix(in srgb, var(--class) 55%, var(--panel-bg));
+}
+.match.first .crest { width: 5rem; height: 5rem; margin-bottom: .5rem; }
+.match.first h2 { font-size: clamp(2rem, 8vw, 3rem); line-height: 1.05; }
+.match.first .match-score { font-size: 1.4rem; }
+.match.first .meter { height: 10px; }
+.match.first li { font-size: 1.2rem; }
+@media (min-width: 900px) {
+  .podium { grid-template-columns: 1fr 1fr; }
+  .match.first { grid-column: 1 / -1; grid-template-columns: 7rem 1fr; column-gap: 2rem; padding: 2rem; }
+  .match.first .crest { width: 7rem; height: 7rem; }
+}
 .match ul { margin: .75rem 0; max-width: 56ch; }
 .match li { padding-left: 1.1rem; position: relative; }
 .match li::before { content: ''; position: absolute; left: 0; top: .72em; width: .45rem; height: 1px; background: var(--gold-mid); }
@@ -436,7 +504,8 @@ p + p { margin-top: 1em; }
 .ranking summary { min-height: 48px; display: inline-flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--gold-bright); }
 .ranking ol { margin-top: .5rem; border-top: 1px solid var(--gold-dark); }
 .ranking li { border-bottom: 1px solid var(--gold-deep); }
-.ranking a { display: flex; justify-content: space-between; gap: 1rem; min-height: 48px; align-items: center; text-decoration: none; }
+.ranking a { position: relative; display: flex; justify-content: space-between; gap: 1rem; min-height: 48px; align-items: center; text-decoration: none; }
+.ranking a::after { content: ''; position: absolute; left: 0; bottom: -1px; height: 2px; width: var(--score); background: var(--class); }
 .ranking a:hover { color: var(--gold-bright); }
 .ranking span:last-child { color: var(--label); font-variant-numeric: tabular-nums; }
 
@@ -461,15 +530,16 @@ p + p { margin-top: 1em; }
 
 .compare-table { width: 100%; margin-top: 2.5rem; border-collapse: collapse; table-layout: fixed; }
 .compare-table th, .compare-table td { padding: .7rem .5rem .7rem 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--gold-deep); }
-.compare-table thead th { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; line-height: 1.25; color: var(--class-text); border-bottom-color: var(--gold-dim); }
+.compare-table thead th { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; line-height: 1.25; color: var(--class-text); border-bottom-color: var(--gold-dim); }
 .compare-table tbody th { width: 30%; font-weight: 400; color: var(--label); }
-.compare-table td.differs { color: var(--gold-bright); }
+.compare-table td { color: var(--label); }
+.compare-table td.differs { color: var(--text); font-weight: 700; }
 .fine { margin-top: .75rem; color: var(--label); font-size: var(--t-label); max-width: 60ch; }
 
 .sides { display: grid; gap: 2.5rem; margin-top: 2.5rem; }
 .side { border-top: 1px solid var(--class); padding-top: 1.25rem; }
 .side .crest { width: 3rem; height: 3rem; color: var(--class); }
-.side h2 { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; line-height: 1.2; color: var(--class-text); margin-top: .5rem; }
+.side h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; line-height: 1.2; color: var(--class-text); margin-top: .5rem; }
 .side h3 { font-size: var(--t-term); font-weight: 600; color: var(--label); margin: 1.5rem 0 .5rem; }
 .side li { padding: .45rem 0; border-bottom: 1px solid var(--gold-deep); }
 .side .tag { margin-left: .4rem; }
@@ -549,25 +619,27 @@ const roleLine = c => {
   return words.map((w, i) => (i ? w.toLowerCase() : w)).join(', ');
 };
 
-// Original line drawings, one stroke weight, drawn inside a shared ring.
+// Original drawings: heavy strokes with a light fill, inside a shared ring.
+// Hammer, paw, cross, bow, daggers, crystal, flame, helm, lightning over water.
+const CREST_FILL = 'fill="currentColor" fill-opacity=".22"';
 const CREST_ART = {
-  paladin: '<path d="M16 14h16v8H16zM24 22v17M21 39h6"/><path d="M24 5v4M13.5 8.5l2 3M34.5 8.5l-2 3M8 17l3.5 1M40 17l-3.5 1"/>',
-  druid: '<path d="M24 23c-5 0-9.5 4.5-9.5 9 0 3.500 3.500 4.500 9.500 4.500s9.500-1 9.500-4.500c0-4.500-4.500-9-9.500-9z"/><ellipse cx="13.500" cy="20" rx="2.600" ry="3.600"/><ellipse cx="20" cy="13.500" rx="2.600" ry="3.600"/><ellipse cx="28" cy="13.500" rx="2.600" ry="3.600"/><ellipse cx="34.500" cy="20" rx="2.600" ry="3.600"/>',
-  priest: '<ellipse cx="24" cy="10.500" rx="8" ry="2.600"/><circle cx="24" cy="20" r="4.500"/><path d="M13 39c0-7.500 4.500-12 11-12s11 4.500 11 12"/><path d="M24 27c6.500 0 11 4.500 11 12H24z" fill="currentColor" fill-opacity=".3" stroke="none"/><path d="M24 27v12"/>',
-  hunter: '<path d="M17 7c13 7 13 27 0 34"/><path d="M17 7v34M9 24h30M39 24l-5-3.500M39 24l-5 3.500M9 24l3.500-3M9 24l3.500 3"/>',
-  rogue: '<path d="M13 35l22-24v5L17 35zM11 29l8 8M13 35l-4 4"/><path d="M35 35L13 11v5l18 19zM37 29l-8 8M35 35l4 4"/>',
-  mage: '<circle cx="24" cy="24" r="13"/><path d="M24 11l11.300 19.500H12.700z"/><circle cx="24" cy="24" r="3.500"/><path d="M24 5v3M7.500 33.500l2.600-1.500M40.500 33.500l-2.600-1.500"/>',
-  warlock: '<path d="M24 8c4.500 6.500 9 10 9 17a9 9 0 0 1-18 0c0-4.500 2-7 4.500-10 1 3.500 2 5 3.500 5 1.500-3.500 1.500-7 1-12z"/><path d="M24 27c2 2.500 3.500 4 3.500 6a3.500 3.500 0 0 1-7 0c0-2 1.500-3.500 3.500-6z"/><path d="M11 14l4 3M37 14l-4 3M14 40h20"/>',
-  warrior: '<path d="M24 7l13 4.500v11c0 8.500-5.500 14-13 17.500-7.500-3.500-13-9-13-17.500v-11z"/><path d="M17 16l14 14M31 16L17 30M17 16v3.500M17 16h3.500M31 16v3.500M31 16h-3.500"/>',
-  shaman: '<path d="M27 5L15.500 23.500h7.500L20 34l12.500-16.500H25z"/><path d="M8 40c3-2.500 5-2.500 8 0s5 2.500 8 0 5-2.500 8 0 5 2.500 8 0"/>'
+  paladin: `<g transform="rotate(40 24 24)"><rect x="12" y="7" width="24" height="12" rx="2" ${CREST_FILL}/><rect x="22" y="19" width="4" height="20" rx="1" ${CREST_FILL}/><path d="M19.500 41h9"/></g>`,
+  druid: `<path d="M24 23c-5 0-9.500 4.500-9.500 9 0 3.500 3.500 4.500 9.500 4.500s9.500-1 9.500-4.500c0-4.500-4.500-9-9.500-9z" ${CREST_FILL}/><ellipse cx="13.500" cy="20" rx="2.600" ry="3.600" ${CREST_FILL}/><ellipse cx="20" cy="13.500" rx="2.600" ry="3.600" ${CREST_FILL}/><ellipse cx="28" cy="13.500" rx="2.600" ry="3.600" ${CREST_FILL}/><ellipse cx="34.500" cy="20" rx="2.600" ry="3.600" ${CREST_FILL}/>`,
+  priest: `<path d="M20.500 5h7v10.500H38v7H27.500V43h-7V22.500H10v-7h10.500z" ${CREST_FILL}/><path d="M24 5h3.500v10.500H38v7H27.500V43H24z" fill="currentColor" fill-opacity=".4"/>`,
+  hunter: `<path d="M17 6c14 7 14 29 0 36z" ${CREST_FILL}/><path d="M8 24h32M40 24l-6-4M40 24l-6 4M8 24l4-3.500M8 24l4 3.500"/>`,
+  rogue: `<path d="M12 36l23-26v6L17 36z" ${CREST_FILL}/><path d="M10 29l9 9M12 36l-4.500 4.500"/><path d="M36 36L13 10v6l18 20z" ${CREST_FILL}/><path d="M38 29l-9 9M36 36l4.500 4.500"/>`,
+  mage: `<path d="M24 4l12 14-12 27L12 18z" ${CREST_FILL}/><path d="M12 18h24M24 4l-5 14 5 27 5-27z"/>`,
+  warlock: `<path d="M24 5c5 7 10.500 11 10.500 19a10.500 10.500 0 0 1-21 0c0-5 2.500-8 5-11.500 1 4 2.500 6 4 6 2-4 2-8.500 1.500-13.500z" ${CREST_FILL}/><path d="M24 27c2.500 3 4 4.500 4 7a4 4 0 0 1-8 0c0-2.500 1.500-4 4-7z" fill="currentColor" fill-opacity=".5"/><path d="M13 42h22"/>`,
+  warrior: `<path d="M12 31v-9a12 12 0 0 1 24 0v9l-4 9H16z" ${CREST_FILL}/><path d="M24 19v21M12 27h8M28 27h8"/><path d="M12.500 19C7 18 5 13 6 7M35.500 19C41 18 43 13 42 7"/>`,
+  shaman: `<path d="M28 3L14 24h8.500L19 36l15-19h-8.500z" ${CREST_FILL}/><path d="M7 42c3-3 5.500-3 8.500 0s5.500 3 8.500 0 5.500-3 8.500 0 5.500 3 8.500 0"/>`
 };
 const SVG_LINE = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"';
 // draw: true gives every stroke a length of 1 so the css can draw it in
 const crest = (c, draw = false) => {
-  const svg = `<svg class="crest${draw ? ' draw' : ''}" viewBox="0 0 48 48" aria-hidden="true" ${SVG_LINE} stroke-width="1.500"><circle cx="24" cy="24" r="22.500" stroke-width="1"/><g transform="translate(24 24) scale(.9) translate(-24 -24)">${CREST_ART[c.id]}</g></svg>`;
-  return draw ? svg.replace(/<(path|circle|ellipse) (?![^>]*stroke="none")/g, '<$1 pathLength="1" ') : svg;
+  const svg = `<svg class="crest${draw ? ' draw' : ''}" viewBox="0 0 48 48" aria-hidden="true" ${SVG_LINE} stroke-width="2"><circle cx="24" cy="24" r="22.500" stroke-width="1.200"/><g transform="translate(24 24) scale(.8) translate(-24 -24)">${CREST_ART[c.id]}</g></svg>`;
+  return draw ? svg.replace(/<(path|circle|ellipse|rect) /g, '<$1 pathLength="1" ') : svg;
 };
-const motif = c => `<svg class="motif" viewBox="0 0 48 48" aria-hidden="true" ${SVG_LINE} stroke-width=".8">${CREST_ART[c.id]}</svg>`;
+const motif = c => `<svg class="motif" viewBox="0 0 48 48" aria-hidden="true" ${SVG_LINE} stroke-width="1.200">${CREST_ART[c.id]}</svg>`;
 
 const PLAY_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true" ${SVG_LINE} stroke-width="1.500"><circle cx="12" cy="12" r="10.500"/><path d="M10 8l6 4-6 4z" fill="currentColor"/></svg>`;
 const clock = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -596,23 +668,25 @@ function renderHome(route) {
   return `
   <div class="wrap">
     ${route.notFound ? '<p class="notice" role="status">That page does not exist. Here is the full list of classes.</p>' : ''}
-    <div class="masthead">
-      <h1 tabindex="-1">Which class should you play in WoW Forever?</h1>
-      <p>All nine classes and 27 specs from Skyy's guide, laid out so you can flip straight to the one you're curious about. <a class="text-link" href="${videoUrl()}" target="_blank" rel="noopener">Watch the full video</a>.</p>
-    </div>
-
-    <section class="start" aria-labelledby="startTitle">
-      <div class="start-grid">
-        <div>
-          <h2 id="startTitle">${esc(q.prompt)}</h2>
-          <p>Pick one to start the quiz. Seven questions, then your three best matches.</p>
-          <p>Already down to two? <a class="text-link" href="#/compare">Compare them side by side</a>.</p>
-        </div>
-        <div class="start-options">
-          ${q.options.map((o, i) => `<a class="option" href="${firstStep(i + 1)}">${esc(o.label)}</a>`).join('')}
-        </div>
+    <div class="home-top">
+      <div class="masthead">
+        <h1 tabindex="-1">Which class should you play in WoW Forever?</h1>
+        <p>All nine classes and 27 specs from Skyy's guide, laid out so you can flip straight to the one you're curious about. <a class="text-link" href="${videoUrl()}" target="_blank" rel="noopener">Watch the full video</a>.</p>
       </div>
-    </section>
+
+      <section class="start" aria-labelledby="startTitle">
+        <div class="start-grid">
+          <div>
+            <h2 id="startTitle">${esc(q.prompt)}</h2>
+            <p>Pick one to start the quiz. Seven questions, then your three best matches.</p>
+          </div>
+          <div class="start-options">
+            ${q.options.map((o, i) => `<a class="option" href="${firstStep(i + 1)}">${esc(o.label)}</a>`).join('')}
+          </div>
+        </div>
+        <p class="start-more">Already down to two? <a class="text-link" href="#/compare">Compare them side by side</a>.</p>
+      </section>
+    </div>
 
     <section aria-labelledby="rosterTitle">
       <div class="roster-head">
@@ -639,7 +713,12 @@ function renderHome(route) {
   </div>`;
 }
 
-const termList = rows => `<dl class="terms">${rows.map(r => `<dt>${esc(r.term)}${tagChip(r.tag)}</dt><dd>${esc(r.text)}</dd>`).join('')}</dl>`;
+// Capstones lead the list, then the rest in the order of the guide.
+const termList = rows => `<dl class="terms">${[...rows.filter(r => r.capstone), ...rows.filter(r => !r.capstone)].map(r => `
+  <div class="term${r.capstone ? ' capstone' : ''}">
+    <dt>${r.capstone ? '<span class="capstone-label">Capstone talent</span>' : ''}${esc(r.term)}${tagChip(r.tag)}</dt>
+    <dd>${esc(r.text)}</dd>
+  </div>`).join('')}</dl>`;
 
 function renderClass(route) {
   const c = route.cls;
@@ -649,7 +728,29 @@ function renderClass(route) {
   const link = id => `#/${c.id}/${id}`;
 
   return `
-  <div class="wrap class-layout" data-class="${c.id}" ${accent(c)}>
+  <div class="class-page" data-class="${c.id}" ${accent(c)}>
+  <header class="class-head" id="overview" data-spy>
+    <div class="wrap head-grid">
+      <div>
+        ${crest(c, true)}
+        <h1 tabindex="-1">${esc(c.name)}</h1>
+        <p class="class-roles">${esc(roleLine(c))}</p>
+        <p class="lead">${esc(c.summary)}</p>
+      </div>
+      <div class="head-panel">
+        <div class="plate" data-media="${c.id}">${motif(c)}</div>
+        <ul class="head-specs" aria-label="${esc(c.name)} specs">
+          ${c.specs.map(s => `<li><a href="${link(s.id)}"><b>${esc(s.name)}</b><span>${esc(s.role)}</span></a></li>`).join('')}
+        </ul>
+        <a class="watch" href="${videoUrl(VIDEO.chapters[c.id])}" target="_blank" rel="noopener">
+          ${PLAY_ICON}
+          <span><b>Watch the ${esc(c.name)} chapter</b><small>Starts at ${clock(VIDEO.chapters[c.id])} in Skyy's video, about ${chapterLength(c)} minutes. Opens YouTube.</small></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap class-layout">
     <nav class="section-nav" aria-label="${esc(c.name)} sections">
       <ul>
         ${SECTIONS.map(s => `<li><a href="${link(s.id)}" data-section="${s.id}">${esc(s.label)}</a></li>`).join('')}
@@ -659,18 +760,6 @@ function renderClass(route) {
     </nav>
 
     <article class="class-body">
-      <header class="class-head" id="overview" data-spy>
-        ${motif(c)}
-        ${crest(c, true)}
-        <h1 tabindex="-1">${esc(c.name)}</h1>
-        <p class="class-roles">${esc(roleLine(c))}</p>
-        <p class="lead">${esc(c.summary)}</p>
-        <a class="watch" href="${videoUrl(VIDEO.chapters[c.id])}" target="_blank" rel="noopener">
-          ${PLAY_ICON}
-          <span><b>Watch the ${esc(c.name)} chapter</b><small>Starts at ${clock(VIDEO.chapters[c.id])} in Skyy's video, about ${chapterLength(c)} minutes. Opens YouTube.</small></span>
-        </a>
-      </header>
-
       <section id="who" data-spy>
         <h2 tabindex="-1">Who it's for</h2>
         <div class="who-block">${paras(c.idealPlayer)}</div>
@@ -704,7 +793,7 @@ function renderClass(route) {
         <div class="spec-intro">${paras(s.intro)}</div>
         <h3>Biggest changes</h3>
         ${termList(s.changes)}
-        ${s.take ? `<aside class="note take"><span class="note-label">Skyy's take</span>${esc(s.take)}</aside>` : ''}
+        ${s.take ? `<blockquote class="take"><p>${esc(s.take)}</p><footer>Skyy's take</footer></blockquote>` : ''}
         ${s.unconfirmed ? `<aside class="note open"><span class="note-label">Not confirmed yet</span>${esc(s.unconfirmed)}</aside>` : ''}
         <p class="spec-more"><a class="text-link" href="#/compare?a=${c.id}.${s.id}">Compare ${esc(s.name)} with another spec</a></p>
       </section>`).join('')}
@@ -720,6 +809,7 @@ function renderClass(route) {
         <a class="next" href="#/${next.id}" ${accent(next)}><small>Next class</small><b>${esc(next.name)}</b></a>
       </nav>
     </article>
+  </div>
   </div>`;
 }
 
@@ -776,14 +866,16 @@ function renderResults(route) {
         : 'You skipped every question, so every spec ties. Retake the quiz and answer at least one, or browse all nine classes.'}</p>
 
       ${top.length ? `<ol class="podium">
-        ${top.map(r => `
-        <li class="match" ${accent(byId(r.classId))}>
-          ${crest(byId(r.classId))}
+        ${top.map((r, i) => `
+        <li class="match${i === 0 ? ' first' : ''}" ${accent(byId(r.classId))}>
+          ${crest(byId(r.classId), i === 0)}
           <div>
+            <span class="match-rank">${['Best match', 'Second', 'Third'][i]}</span>
             <div class="match-title">
               <h2>${esc(r.specName)} ${esc(r.className)}</h2>
               <span class="match-score">${r.score}% match</span>
             </div>
+            <div class="meter" aria-hidden="true"><i style="width:${r.score}%"></i></div>
             <div class="match-role">${esc(r.role)}</div>
             ${r.reasons.length ? `<ul>${r.reasons.slice(0, 3).map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
             <a class="text-link" href="#/${r.classId}/${r.specId}">Read about ${esc(r.specName)} ${esc(r.className)}</a>
@@ -794,7 +886,7 @@ function renderResults(route) {
       ${answered ? `<details class="ranking">
         <summary>See how all 27 specs scored</summary>
         <ol>
-          ${ranked.map(r => `<li><a href="#/${r.classId}/${r.specId}"><span>${esc(r.specName)} ${esc(r.className)}</span><span>${r.score}%</span></a></li>`).join('')}
+          ${ranked.map(r => `<li ${accent(byId(r.classId)).replace('"', `"--score:${r.score}%;`)}><a href="#/${r.classId}/${r.specId}"><span>${esc(r.specName)} ${esc(r.className)}</span><span>${r.score}%</span></a></li>`).join('')}
         </ol>
       </details>` : ''}
 
@@ -873,7 +965,7 @@ function renderCompare(route) {
   <div class="wrap">
     <div class="compare">
       <h1 tabindex="-1">Compare two specs</h1>
-      <p>${a && b ? 'Where the two differ is marked in gold.' : 'Pick any two of the 27 specs to see them side by side.'}</p>
+      <p>${a && b ? 'Rows where the two differ are in bold.' : 'Pick any two of the 27 specs to see them side by side.'}</p>
 
       <div class="pickers">
         ${picker('pickA', 'First spec', a)}

@@ -94,7 +94,7 @@ const CLASSES = [
         ],
         changes: [
           { tag: 'moved', term: 'Holy Shock', text: 'Moved from the 31-point capstone to a 21-point talent, so you can pick it up with less investment and have more points to play with elsewhere.' },
-          { tag: 'new', term: 'Light\'s Vigil', text: 'The new capstone, giving Holy access to AoE healing or AoE damage. That is a big addition for a spec that has traditionally been so focused on keeping individual targets alive.' },
+          { tag: 'new', capstone: true, term: 'Light\'s Vigil', text: 'The new capstone, giving Holy access to AoE healing or AoE damage. That is a big addition for a spec that has traditionally been so focused on keeping individual targets alive.' },
           { tag: 'new', term: 'Voice of Truth', text: 'Six seconds of immunity to silences and interrupts. If you need to get a heal off while somebody is trying to smash you in the face, that is an incredibly useful tool to have.' },
           { tag: 'same', term: 'Illumination', text: 'Still there for your mana refunds from healing crits, while other talents improve the damage, hit chance, and crit chance of your Holy spells. There is support here for both your healing and the offensive side of the class.' }
         ]
@@ -107,7 +107,7 @@ const CLASSES = [
           'With well-timed seals and strikes you can deal devastating attacks, but even with your attention on the enemy, your job is to always assist a companion who is in need of your aid. Knowing when to interrupt your assault with a blessing or heal is part of mastering Retribution.'
         ],
         changes: [
-          { tag: 'new', term: 'Twist of the Light', text: 'The new capstone. Replacing an eligible seal gives you an echo of the seal you just replaced. Your next melee attack then applies that old seal\'s effect and consumes the echo.' },
+          { tag: 'new', capstone: true, term: 'Twist of the Light', text: 'The new capstone. Replacing an eligible seal gives you an echo of the seal you just replaced. Your next melee attack then applies that old seal\'s effect and consumes the echo.' },
           { term: 'Seal twisting, made forgiving', text: 'Say you have Seal of Command active, then switch to Seal of Righteousness. Your next swing can carry that Command effect along with your new seal. You are carrying the effect into your next attack instead of relying on that tiny timing window.' },
           { term: 'Shockadin', text: 'With Holy Shock moving earlier in Holy and Intellect scaling available deeper in Ret, there is potential to combine the two for a build that leans more into spell damage.' }
         ]
@@ -158,8 +158,8 @@ const CLASSES = [
         ],
         changes: [
           { tag: 'new', term: 'Primal Bite', text: 'Bears gain another major attack to work into their tanking.' },
-          { tag: 'new', term: 'Berserk, as a bear', text: 'The new capstone removes Mangle\'s cooldown and lets it hit up to three targets. When you have several enemies in front of you, you have a window where you can repeatedly hit them with Mangle.' },
-          { tag: 'new', term: 'Berserk, as a cat', text: 'Increases the critical-strike chance of your combo-point-generating abilities by 100%, giving you a major burst window. Berserk lasts 15 seconds and also makes you immune to fear.' },
+          { tag: 'new', capstone: true, term: 'Berserk, as a bear', text: 'The new capstone removes Mangle\'s cooldown and lets it hit up to three targets. When you have several enemies in front of you, you have a window where you can repeatedly hit them with Mangle.' },
+          { tag: 'new', capstone: true, term: 'Berserk, as a cat', text: 'Increases the critical-strike chance of your combo-point-generating abilities by 100%, giving you a major burst window. Berserk lasts 15 seconds and also makes you immune to fear.' },
           { term: 'Bear or cat', text: 'There are enough separate damage and defensive investments that you will have to make some choices between maximizing cat and bear. You can still build around using both forms, but getting everything you want for both roles comes with tradeoffs.' }
         ]
       },
@@ -171,7 +171,7 @@ const CLASSES = [
           'Your strength lies in preparing for damage before it arrives. Keep healing effects upon those in danger, tend to several wounded allies, and reserve a swift response for anyone close to falling.'
         ],
         changes: [
-          { tag: 'new', term: 'Wild Growth', text: 'The new capstone, adding an AoE healing-over-time tool for when multiple people are taking damage.' },
+          { tag: 'new', capstone: true, term: 'Wild Growth', text: 'The new capstone, adding an AoE healing-over-time tool for when multiple people are taking damage.' },
           { tag: 'moved', term: 'Swiftmend', text: 'Moves up to the 16-point talent tier, so you can pick up that immediate healing option much earlier in your build.' },
           { tag: 'new', term: 'Gift of the Earthmother', text: 'Reduces the global cooldown on Rejuvenation, Swiftmend, and Wild Growth by half a second. You can spread Rejuvenations around more quickly, respond with Swiftmend, and use Wild Growth when several people need healing together.' },
           { term: 'A regular resurrection', text: 'With Revive finally available, you are bringing a much more convenient toolkit into your dungeon groups.' }
@@ -260,7 +260,7 @@ const CLASSES = [
           'The Holy Priest answers suffering with the Light, tending to a single grievous wound or reaching across a party with healing prayer and mending. This is a dedicated healing specialization, offering a broad collection of spells for the many dangers an adventuring company will face.'
         ],
         changes: [
-          { tag: 'new', term: 'Prayer of Mending', text: 'The new capstone. A reactive heal that triggers when its target takes damage and then jumps to another party or raid member.' },
+          { tag: 'new', capstone: true, term: 'Prayer of Mending', text: 'The new capstone. A reactive heal that triggers when its target takes damage and then jumps to another party or raid member.' },
           { tag: 'new', term: 'Binding Heal', text: 'Heals yourself and somebody else with the same cast. When you and your tank are both getting beat up, that gives you a way to help both of you at once.' },
           { tag: 'new', term: 'Litany of Light', text: 'Rewards you for changing which healing spell you use. If your previous heal was a different spell, you recover mana equal to 5% of the base mana cost of the spell you just cast.' },
           { tag: 'improved', term: 'Spirit of Redemption', text: 'Now lasts 15 seconds instead of ten, giving you another five seconds to keep healing after you die. Hopefully you won\'t need it, but when a pull goes wrong, those extra seconds can matter.' }
@@ -324,7 +324,7 @@ const CLASSES = [
           { tag: 'new', term: 'Careful Aim', text: 'Gives you attack power equal to 20% of your Intellect, so Intellect can now contribute to your damage alongside your mana pool.' },
           { tag: 'new', term: 'Rapid Killing and Rapid Recuperation', text: 'Support your mana recovery and help you move from one kill into the next with less downtime. Particularly useful when you are out there leveling.' },
           { tag: 'new', term: 'Lone Wolf', text: 'At the 11-point tier, 20% increased damage while you are without a pet. That opens up a pretty different way to play, and it is early enough that Survival can potentially pick it up as well.' },
-          { tag: 'new', term: 'Sniper Shot', text: 'The big new button. A four-second cast on a 15-second cooldown. Four seconds is a commitment. If you enjoy that slower gameplay of lining up a big shot from far away, that is clearly a direction this tree is supporting.' }
+          { tag: 'new', capstone: true, term: 'Sniper Shot', text: 'The big new button. A four-second cast on a 15-second cooldown. Four seconds is a commitment. If you enjoy that slower gameplay of lining up a big shot from far away, that is clearly a direction this tree is supporting.' }
         ]
       },
       {
@@ -337,7 +337,7 @@ const CLASSES = [
         changes: [
           { tag: 'new', term: 'Strider Kick', text: 'An instant attack dealing 100% melee damage on an eight-second cooldown, giving you a regular button to press while you are up close.' },
           { tag: 'new', term: 'Expose Prey', text: 'The new 21-point talent gives your melee hits a 10% chance to proc a free Mongoose Bite.' },
-          { tag: 'new', term: 'Lacerating Strikes', text: 'The new capstone makes Mongoose Bite apply a bleed. Your melee attacks can give you a free Mongoose Bite, and that Mongoose Bite adds damage over time.' },
+          { tag: 'new', capstone: true, term: 'Lacerating Strikes', text: 'The new capstone makes Mongoose Bite apply a bleed. Your melee attacks can give you a free Mongoose Bite, and that Mongoose Bite adds damage over time.' },
           { tag: 'new', term: 'Predator\'s Edge', text: 'Increases melee critical-strike damage and offhand weapon damage, so there is clear support for dual wielding.' },
           { tag: 'improved', term: 'Traps and roots', text: 'Entrapment now roots targets hit by any trap for five seconds. Improved Wing Clip keeps its 20% root chance but costs three talent points instead of five. Surefooted reduces the duration of movement-impairing effects by 30%.' }
         ],
@@ -386,7 +386,7 @@ const CLASSES = [
         ],
         changes: [
           { tag: 'new', term: 'Mutilate', text: 'This tree is leaning much harder into poison damage, and you are picking up Mutilate as another major attack for your dagger gameplay.' },
-          { tag: 'new', term: 'Venom', text: 'The new capstone, a finishing move that puts a debuff on your target, increasing your poison damage by 30% on them and making your poisons more likely to apply. Spending more combo points makes that debuff last longer.' },
+          { tag: 'new', capstone: true, term: 'Venom', text: 'The new capstone, a finishing move that puts a debuff on your target, increasing your poison damage by 30% on them and making your poisons more likely to apply. Spending more combo points makes that debuff last longer.' },
           { tag: 'moved', term: 'Cold Blood', text: 'Moves up to the 16-point talent tier, making it easier to pick up, including for builds going deeper into another tree.' },
           { tag: 'improved', term: 'Expose Armor', text: 'Cheaper in both energy and combo points, so bringing that armor reduction costs you less of your resources.' },
           { term: 'Seal Fate and Puncturing Wounds', text: 'Seal Fate rewards critical hits from your combo-point builders with additional points, while the early Combat talent Puncturing Wounds adds crit chance to Backstab and Mutilate.' }
@@ -412,7 +412,7 @@ const CLASSES = [
           'The Subtlety Rogue approaches unseen, studying an enemy for the moment their guard falters. This is a melee damage specialization that rewards preparation and sudden opportunity, pairing attacks from the shadows with bleeds and carefully placed strikes.'
         ],
         changes: [
-          { tag: 'new', term: 'Thousand Cuts', text: 'The new capstone. Rupture ticks reduce the energy cost of your next Hemorrhage or Backstab, stacking up to five times. Keeping your bleed going helps you afford the attacks you use to build more combo points.' },
+          { tag: 'new', capstone: true, term: 'Thousand Cuts', text: 'The new capstone. Rupture ticks reduce the energy cost of your next Hemorrhage or Backstab, stacking up to five times. Keeping your bleed going helps you afford the attacks you use to build more combo points.' },
           { tag: 'improved', term: 'Hemorrhage', text: 'Also increases Rupture damage, giving those abilities another reason to work together, even if you are building around daggers.' },
           { tag: 'new', term: 'Cutthroat', text: 'A deep Subtlety talent giving Backstab a 15% chance to let you use Ambush without being stealthed, within the next ten seconds. Improved Ambush also moves earlier in the tree.' },
           { tag: 'moved', term: 'Premeditation', text: 'Moves to the 21-point talent tier. Combined with Cold Blood moving earlier in Assassination, you can now pick up both and still have points left to spend elsewhere.' }
@@ -536,7 +536,7 @@ const CLASSES = [
         ],
         changes: [
           { tag: 'improved', term: 'Drains', text: 'There is more talent support for your channeled spells, including Drain Life, Drain Soul, and the new capstone, Drain Hope.' },
-          { tag: 'new', term: 'Drain Hope', text: 'Increases the Shadow damage from your other DoTs on that target, so there is a direct connection between setting up your damage-over-time effects and following them with your channel.' },
+          { tag: 'new', capstone: true, term: 'Drain Hope', text: 'Increases the Shadow damage from your other DoTs on that target, so there is a direct connection between setting up your damage-over-time effects and following them with your channel.' },
           { tag: 'moved', term: 'Siphon Life with Soul Link', text: 'Soul Link moves up to the 21-point tier in Demonology, so you can now reach both in the same build. Anybody who remembers that combination knows why people are already looking at it for PvP. We will have to see how durable it actually ends up being.' }
         ]
       },
@@ -548,7 +548,7 @@ const CLASSES = [
           'You choose the demon and sacrifice benefit that serve the encounter, then direct your companion while casting alongside it. Watch its health, control its target, and make use of its particular abilities. Your effectiveness depends on commanding both halves of that partnership.'
         ],
         changes: [
-          { tag: 'new', term: 'Demonic Pact', text: 'The new capstone lets you keep the passive benefit from Demonic Sacrifice while having another demon summoned. You could sacrifice a Succubus for its benefit, then bring out a Voidwalker to fight alongside you.' },
+          { tag: 'new', capstone: true, term: 'Demonic Pact', text: 'The new capstone lets you keep the passive benefit from Demonic Sacrifice while having another demon summoned. You could sacrifice a Succubus for its benefit, then bring out a Voidwalker to fight alongside you.' },
           { tag: 'new', term: 'Demonic Brand', text: 'A 16-point talent that reduces the threat generated by Searing Pain while making your pet\'s next two hits against that target deal increased damage and threat. Casting Searing Pain helps your demon hold the enemy\'s attention.' },
           { term: 'Voidwalker tanking', text: 'There is potential to experiment with a Voidwalker taking hits in a dungeon, but we would need to see how its survivability and threat actually hold up before calling it a reliable tank.' }
         ]
@@ -704,7 +704,7 @@ const CLASSES = [
         changes: [
           { tag: 'improved', term: 'Two-handers and Stormstrike', text: 'Two-handed weapons no longer require a talent investment. Stormstrike moves up to the 16-point talent tier, and it is on a short cooldown rather than 60 seconds now.' },
           { tag: 'new', term: 'Maelstrom Weapon', text: 'Lets you build up stacks to reduce Lightning Bolt\'s cast time until it is instant.' },
-          { tag: 'new', term: 'Rage of the Farseer', text: 'The new capstone, a never-before-seen three-minute cooldown giving you 30% haste for 25 seconds. It is basically your own personal Bloodlust. As far as we have seen, there is no group-wide Bloodlust or Heroism here, so that haste is just for you.' },
+          { tag: 'new', capstone: true, term: 'Rage of the Farseer', text: 'The new capstone, a never-before-seen three-minute cooldown giving you 30% haste for 25 seconds. It is basically your own personal Bloodlust. As far as we have seen, there is no group-wide Bloodlust or Heroism here, so that haste is just for you.' },
           { tag: 'improved', term: 'Ghost Wolf', text: 'Works indoors, with an early Enhancement talent making it instant. A massive quality-of-life improvement for getting around and chasing people down.' },
           { tag: 'new', term: 'Tanking tools', text: 'Spirit Weapons reduces your threat by 30% without Rockbiter and increases it by 30% with Rockbiter active. You can also talent into more dodge and stamina, while Improved Stormstrike provides mana regeneration for 15 seconds and lets dodges or parries reset Stormstrike\'s cooldown.' }
         ],
