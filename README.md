@@ -12,8 +12,10 @@ Fan-made. Not affiliated with Blizzard Entertainment.
 | `data.js` | All guide text and the quiz tags for each spec |
 | `quiz.js` | The quiz questions and scoring |
 | `tests/quiz.test.mjs` | Checks on the content and the scoring |
+| `favicon.svg`, `og.png` | Browser tab icon and the image shown when the link is shared |
+| `tools/make-og.js` | Rebuilds `og.png` from the crests |
 
-No build step and no dependencies. No images: the crests are inline SVG drawn for this site.
+No build step and no dependencies. The crests are inline SVG drawn for this site.
 
 ## Routes
 
@@ -24,6 +26,7 @@ No build step and no dependencies. No images: the crests are inline SVG drawn fo
 | `#/<class>/<section>` | A section or spec, for example `#/paladin/holy` or `#/warlock/changes` |
 | `#/quiz` | Quiz |
 | `#/results?a=<answers>` | Results. The link can be shared |
+| `#/compare?a=<class>.<spec>&b=<class>.<spec>` | Two specs side by side, for example `#/compare?a=warrior.arms&b=warrior.fury` |
 
 ## Editing the guide
 
@@ -75,6 +78,22 @@ Every spec carries tags the quiz scores against. Role, range and pet come straig
 | Shaman | Restoration | 2 | 3 | 1 | 0 |
 
 Question weights: role 3, range 2, pet 2, fantasy 2, complexity 1.5, support 1, solo 1. "No preference" leaves a question out of the score.
+
+## Video chapters
+
+Each class page links to its chapter of the video. The start times are in `VIDEO` at the top of `data.js`, in seconds, taken from the chapter list in the video description. There are no spec-level times.
+
+## Change tags
+
+Each change can carry a tag: New, Now baseline, Moved, Improved, Toned down, Mixed or Unchanged. **The tags are a reading of Skyy's text, not something Skyy assigned.** Changes with no clear direction have no tag. Edit the `tag` field in `data.js` to correct one.
+
+## Share image
+
+After changing a crest or the site title, rebuild the image:
+
+```
+node tools/make-og.js "C:Program FilesGoogleChromeApplicationchrome.exe"
+```
 
 ## Open questions for Skyy
 

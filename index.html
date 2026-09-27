@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Forever Class Guide</title>
 <meta name="description" content="All nine WoW Forever classes and 27 specs from Skyy's class picking guide, with a short quiz to help you choose.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#12100b">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Forever Class Guide">
+<meta property="og:title" content="Which class should you play in WoW Forever?">
+<meta property="og:description" content="All nine classes and 27 specs from Skyy's guide, plus a seven-question quiz that finds your three best matches.">
+<meta property="og:url" content="https://forever-class-picker.vercel.app/">
+<meta property="og:image" content="https://forever-class-picker.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Forever Class Guide: crests for the nine WoW Forever classes">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -167,6 +179,8 @@ p + p { margin-top: 1em; }
 }
 
 .text-link { color: var(--gold-bright); text-underline-offset: .2em; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.menu-foot { display: flex; flex-wrap: wrap; gap: .5rem; }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -272,8 +286,44 @@ p + p { margin-top: 1em; }
 
 .class-body section, .class-body header { scroll-margin-top: calc(var(--header-h) + 3.5rem); }
 
-.class-head { padding: 2rem 0 0; }
+.class-head { padding: 2rem 0 0; position: relative; isolation: isolate; overflow: hidden; }
 .class-head .crest { width: 4.5rem; height: 4.5rem; color: var(--class); display: block; margin-bottom: .75rem; }
+
+/* the class mark, large and faint, behind the class name */
+.motif {
+  position: absolute; z-index: -1; right: -2rem; top: .5rem;
+  width: 15rem; height: 15rem;
+  color: var(--class); opacity: .09; pointer-events: none;
+}
+@media (min-width: 900px) { .motif { width: 24rem; height: 24rem; right: 0; top: 0; } }
+
+/* the one entrance: the crest draws itself when a class page opens */
+.crest.draw [pathLength] { stroke-dasharray: 1; animation: draw 1s ease-out both; }
+.crest.draw g [pathLength] { animation-delay: .25s; }
+.crest.draw [fill="currentColor"] { animation: enter .4s ease-out .9s both; }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+.watch {
+  display: inline-flex; align-items: center; gap: .75rem;
+  min-height: 52px; margin-top: 1.5rem; padding: .5rem 1.1rem .5rem .9rem;
+  border: 1px solid var(--gold-dim); text-decoration: none; line-height: 1.3;
+}
+.watch:hover { border-color: var(--gold-bright); }
+.watch svg { width: 1.6rem; height: 1.6rem; flex: none; color: var(--class-text); }
+.watch b { display: block; font-weight: 600; }
+.watch small { color: var(--label); font-size: var(--t-label); }
+
+.tag {
+  display: inline-block; margin-left: .5rem; padding: 0 .45rem;
+  border: 1px solid var(--gold-dark);
+  font-size: .85rem; font-weight: 600; line-height: 1.5; white-space: nowrap;
+  color: var(--label); vertical-align: .08em;
+}
+.tag-new { color: var(--gold-bright); border-color: var(--gold-dim); }
+.tag-nerf { color: #ff9a8a; border-color: #7a3a30; }
+
+.spec-more { margin-top: 1.5rem; }
+.spec-more a { min-height: 44px; display: inline-flex; align-items: center; }
 .class-head h1 { font-family: var(--font-display); font-size: var(--t-class); line-height: 1.05; font-weight: 400; color: var(--class-text); }
 .class-roles { margin-top: .4rem; color: var(--label); }
 .lead { margin-top: 1.5rem; font-size: 1.3rem; line-height: 1.5; max-width: 60ch; }
@@ -394,6 +444,43 @@ p + p { margin-top: 1em; }
 .share-url { width: 100%; margin-top: .75rem; min-height: 44px; padding: 0 .75rem; font: inherit; color: var(--text); background: var(--leather); border: 1px solid var(--gold-dark); }
 .share-url[hidden] { display: none; }
 
+/* ---------------- Compare ---------------- */
+
+.compare { padding-top: 2rem; }
+.compare h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.1; font-weight: 600; }
+.compare > p { margin-top: .75rem; color: var(--label); max-width: 52ch; }
+
+.pickers { display: grid; gap: 1rem; margin-top: 1.5rem; }
+.pickers label { display: block; font-weight: 600; margin-bottom: .25rem; }
+.pickers select {
+  width: 100%; min-height: 52px; padding: 0 .75rem;
+  font: inherit; color: var(--text); background: var(--leather);
+  border: 1px solid var(--gold-dim); border-radius: 0;
+}
+.pickers option, .pickers optgroup { background: var(--leather); color: var(--text); }
+
+.compare-table { width: 100%; margin-top: 2.5rem; border-collapse: collapse; table-layout: fixed; }
+.compare-table th, .compare-table td { padding: .7rem .5rem .7rem 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--gold-deep); }
+.compare-table thead th { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; line-height: 1.25; color: var(--class-text); border-bottom-color: var(--gold-dim); }
+.compare-table tbody th { width: 30%; font-weight: 400; color: var(--label); }
+.compare-table td.differs { color: var(--gold-bright); }
+.fine { margin-top: .75rem; color: var(--label); font-size: var(--t-label); max-width: 60ch; }
+
+.sides { display: grid; gap: 2.5rem; margin-top: 2.5rem; }
+.side { border-top: 1px solid var(--class); padding-top: 1.25rem; }
+.side .crest { width: 3rem; height: 3rem; color: var(--class); }
+.side h2 { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; line-height: 1.2; color: var(--class-text); margin-top: .5rem; }
+.side h3 { font-size: var(--t-term); font-weight: 600; color: var(--label); margin: 1.5rem 0 .5rem; }
+.side li { padding: .45rem 0; border-bottom: 1px solid var(--gold-deep); }
+.side .tag { margin-left: .4rem; }
+.side-links { display: grid; margin-top: 1rem; }
+.side-links a { min-height: 44px; display: inline-flex; align-items: center; }
+
+@media (min-width: 700px) {
+  .pickers, .sides { grid-template-columns: 1fr 1fr; column-gap: 3rem; }
+  .compare-table thead th { font-size: 1.4rem; }
+}
+
 /* ---------------- Footer ---------------- */
 
 .site-footer { border-top: 1px solid var(--gold-deep); padding: 2rem 0 3rem; color: var(--label); font-size: var(--t-label); }
@@ -427,7 +514,7 @@ p + p { margin-top: 1em; }
 
 <footer class="site-footer">
   <div class="wrap">
-    <p>Written by Skyy of The Comeback Kids, from the WoW Forever class picking guide. This is a fan-made site and is not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment.</p>
+    <p>Written by Skyy of The Comeback Kids, from the WoW Forever class picking guide. <a class="text-link" href="https://www.youtube.com/watch?v=ol4GLfQNw-g" target="_blank" rel="noopener">Watch the video on YouTube</a>. This is a fan-made site and is not affiliated with Blizzard Entertainment. World of Warcraft is a trademark of Blizzard Entertainment.</p>
   </div>
 </footer>
 
@@ -473,7 +560,24 @@ const CREST_ART = {
   warrior: '<path d="M24 7l13 4.500v11c0 8.500-5.500 14-13 17.500-7.500-3.500-13-9-13-17.500v-11z"/><path d="M17 16l14 14M31 16L17 30M17 16v3.500M17 16h3.500M31 16v3.500M31 16h-3.500"/>',
   shaman: '<path d="M27 5L15.500 23.500h7.500L20 34l12.500-16.500H25z"/><path d="M8 40c3-2.500 5-2.500 8 0s5 2.500 8 0 5-2.500 8 0 5 2.500 8 0"/>'
 };
-const crest = c => `<svg class="crest" viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.500" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="22.500" stroke-width="1"/><g transform="translate(24 24) scale(.9) translate(-24 -24)">${CREST_ART[c.id]}</g></svg>`;
+const SVG_LINE = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"';
+// draw: true gives every stroke a length of 1 so the css can draw it in
+const crest = (c, draw = false) => {
+  const svg = `<svg class="crest${draw ? ' draw' : ''}" viewBox="0 0 48 48" aria-hidden="true" ${SVG_LINE} stroke-width="1.500"><circle cx="24" cy="24" r="22.500" stroke-width="1"/><g transform="translate(24 24) scale(.9) translate(-24 -24)">${CREST_ART[c.id]}</g></svg>`;
+  return draw ? svg.replace(/<(path|circle|ellipse) (?![^>]*stroke="none")/g, '<$1 pathLength="1" ') : svg;
+};
+const motif = c => `<svg class="motif" viewBox="0 0 48 48" aria-hidden="true" ${SVG_LINE} stroke-width=".8">${CREST_ART[c.id]}</svg>`;
+
+const PLAY_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true" ${SVG_LINE} stroke-width="1.500"><circle cx="12" cy="12" r="10.500"/><path d="M10 8l6 4-6 4z" fill="currentColor"/></svg>`;
+const clock = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+const videoUrl = start => `https://www.youtube.com/watch?v=${VIDEO.id}${start ? `&t=${start}s` : ''}`;
+// how long a class chapter runs, from its start to the next chapter
+const chapterLength = c => {
+  const i = CLASSES.indexOf(c);
+  const next = i + 1 < CLASSES.length ? VIDEO.chapters[CLASSES[i + 1].id] : VIDEO.end;
+  return Math.round((next - VIDEO.chapters[c.id]) / 60);
+};
+const tagChip = tag => (tag ? `<span class="tag tag-${tag}">${esc(TAGS[tag])}</span>` : '');
 
 /* ================================================================
    VIEWS
@@ -493,7 +597,7 @@ function renderHome(route) {
     ${route.notFound ? '<p class="notice" role="status">That page does not exist. Here is the full list of classes.</p>' : ''}
     <div class="masthead">
       <h1 tabindex="-1">Which class should you play in WoW Forever?</h1>
-      <p>All nine classes and 27 specs from Skyy's guide, laid out so you can flip straight to the one you're curious about.</p>
+      <p>All nine classes and 27 specs from Skyy's guide, laid out so you can flip straight to the one you're curious about. <a class="text-link" href="${videoUrl()}" target="_blank" rel="noopener">Watch the full video</a>.</p>
     </div>
 
     <section class="start" aria-labelledby="startTitle">
@@ -501,6 +605,7 @@ function renderHome(route) {
         <div>
           <h2 id="startTitle">${esc(q.prompt)}</h2>
           <p>Pick one to start the quiz. Seven questions, then your three best matches.</p>
+          <p>Already down to two? <a class="text-link" href="#/compare">Compare them side by side</a>.</p>
         </div>
         <div class="start-options">
           ${q.options.map((o, i) => `<a class="option" href="${firstStep(i + 1)}">${esc(o.label)}</a>`).join('')}
@@ -533,7 +638,7 @@ function renderHome(route) {
   </div>`;
 }
 
-const termList = rows => `<dl class="terms">${rows.map(r => `<dt>${esc(r.term)}</dt><dd>${esc(r.text)}</dd>`).join('')}</dl>`;
+const termList = rows => `<dl class="terms">${rows.map(r => `<dt>${esc(r.term)}${tagChip(r.tag)}</dt><dd>${esc(r.text)}</dd>`).join('')}</dl>`;
 
 function renderClass(route) {
   const c = route.cls;
@@ -554,10 +659,15 @@ function renderClass(route) {
 
     <article class="class-body">
       <header class="class-head" id="overview" data-spy>
-        ${crest(c)}
+        ${motif(c)}
+        ${crest(c, true)}
         <h1 tabindex="-1">${esc(c.name)}</h1>
         <p class="class-roles">${esc(roleLine(c))}</p>
         <p class="lead">${esc(c.summary)}</p>
+        <a class="watch" href="${videoUrl(VIDEO.chapters[c.id])}" target="_blank" rel="noopener">
+          ${PLAY_ICON}
+          <span><b>Watch the ${esc(c.name)} chapter</b><small>Starts at ${clock(VIDEO.chapters[c.id])} in Skyy's video, about ${chapterLength(c)} minutes. Opens YouTube.</small></span>
+        </a>
       </header>
 
       <section id="who" data-spy>
@@ -595,6 +705,7 @@ function renderClass(route) {
         ${termList(s.changes)}
         ${s.take ? `<aside class="note take"><span class="note-label">Skyy's take</span>${esc(s.take)}</aside>` : ''}
         ${s.unconfirmed ? `<aside class="note open"><span class="note-label">Not confirmed yet</span>${esc(s.unconfirmed)}</aside>` : ''}
+        <p class="spec-more"><a class="text-link" href="#/compare?a=${c.id}.${s.id}">Compare ${esc(s.name)} with another spec</a></p>
       </section>`).join('')}
 
       <section class="closing">
@@ -687,6 +798,7 @@ function renderResults(route) {
       </details>` : ''}
 
       <div class="results-actions">
+        ${top.length > 1 ? `<a class="btn" href="#/compare?a=${top[0].classId}.${top[0].specId}&b=${top[1].classId}.${top[1].specId}">Compare your top two</a>` : ''}
         ${answered ? '<button type="button" class="btn" id="copyBtn">Copy link to these results</button>' : ''}
         <a class="btn" href="#/quiz">Retake the quiz</a>
         <a class="btn" href="#/">All nine classes</a>
@@ -706,7 +818,80 @@ function renderMenu() {
         <div class="menu-specs">${c.specs.map(s => `<a href="#/${c.id}/${s.id}">${esc(s.name)}</a>`).join('')}</div>
       </li>`).join('')}
     </ul>
-    <div class="menu-foot"><a class="btn" href="#/quiz">Take the quiz</a></div>
+    <div class="menu-foot"><a class="btn" href="#/quiz">Take the quiz</a> <a class="btn" href="#/compare">Compare two specs</a></div>
+  </div>`;
+}
+
+const RATING_WORDS = {
+  pet: ['None', 'Optional', 'Central to the spec'],
+  complexity: ['', 'Simple', 'A few things to track', 'A lot to juggle'],
+  support: ['', 'Own performance', 'Some of both', 'Brings a lot to a party'],
+  solo: ['', 'Best in a group', 'Fine either way', 'Strong alone']
+};
+
+function renderCompare(route) {
+  const { a, b } = route;
+  const key = x => (x ? `${x.cls.id}.${x.spec.id}` : '');
+  const name = x => `${x.spec.name} ${x.cls.name}`;
+
+  const picker = (id, label, chosen) => `
+    <div>
+      <label for="${id}">${label}</label>
+      <select id="${id}" data-compare>
+        <option value="">Choose a spec</option>
+        ${CLASSES.map(c => `<optgroup label="${esc(c.name)}">${c.specs.map(s => {
+          const v = `${c.id}.${s.id}`;
+          return `<option value="${v}"${v === key(chosen) ? ' selected' : ''}>${esc(s.name)} ${esc(c.name)}</option>`;
+        }).join('')}</optgroup>`).join('')}
+      </select>
+    </div>`;
+
+  const rows = a && b ? [
+    ['Role', x => x.spec.role],
+    ['Fights', x => (x.spec.range === 'melee' ? 'Up close' : 'From a distance')],
+    ['Pet', x => RATING_WORDS.pet[x.spec.pet]],
+    ['To juggle', x => RATING_WORDS.complexity[x.spec.complexity], true],
+    ['Group help', x => RATING_WORDS.support[x.spec.support], true],
+    ['Solo play', x => RATING_WORDS.solo[x.spec.solo], true]
+  ] : [];
+
+  const side = x => `
+    <section class="side" ${accent(x.cls)}>
+      ${crest(x.cls)}
+      <h2>${esc(name(x))}</h2>
+      <p>${esc(x.spec.intro[0])}</p>
+      <h3>Biggest changes</h3>
+      <ul>${x.spec.changes.map(r => `<li>${esc(r.term)}${tagChip(r.tag)}</li>`).join('')}</ul>
+      <div class="side-links">
+        <a class="text-link" href="#/${x.cls.id}/${x.spec.id}">Read about ${esc(name(x))}</a>
+        <a class="text-link" href="${videoUrl(VIDEO.chapters[x.cls.id])}" target="_blank" rel="noopener">Watch the ${esc(x.cls.name)} chapter</a>
+      </div>
+    </section>`;
+
+  return `
+  <div class="wrap">
+    <div class="compare">
+      <h1 tabindex="-1">Compare two specs</h1>
+      <p>${a && b ? 'Where the two differ is marked in gold.' : 'Pick any two of the 27 specs to see them side by side.'}</p>
+
+      <div class="pickers">
+        ${picker('pickA', 'First spec', a)}
+        ${picker('pickB', 'Second spec', b)}
+      </div>
+
+      ${a && b ? `
+      <table class="compare-table">
+        <thead><tr><th scope="col"><span class="sr">Trait</span></th><th scope="col" ${accent(a.cls)}>${esc(name(a))}</th><th scope="col" ${accent(b.cls)}>${esc(name(b))}</th></tr></thead>
+        <tbody>
+          ${rows.map(([label, get, rated]) => {
+            const differs = get(a) !== get(b) ? ' class="differs"' : '';
+            return `<tr><th scope="row">${label}${rated ? ' *' : ''}</th><td${differs}>${esc(get(a))}</td><td${differs}>${esc(get(b))}</td></tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <p class="fine">* These three are this site's reading of the guide, not something Skyy rated.</p>
+      <div class="sides">${side(a)}${side(b)}</div>` : ''}
+    </div>
   </div>`;
 }
 
@@ -725,6 +910,9 @@ function parseRoute(hash) {
   if (!parts.length) return { view: 'home' };
   if (parts[0] === 'quiz' && parts.length === 1) return { view: 'quiz', answers: parseAnswers(a) };
   if (parts[0] === 'results' && parts.length === 1) return { view: 'results', answers: parseAnswers(a) };
+  if (parts[0] === 'compare' && parts.length === 1) {
+    return { view: 'compare', a: findSpec(a, CLASSES), b: findSpec(new URLSearchParams(query).get('b'), CLASSES) };
+  }
 
   const cls = CLASSES.find(c => c.id === parts[0]);
   if (cls && parts.length <= 2) {
@@ -738,7 +926,11 @@ const VIEWS = {
   home: { render: renderHome, title: () => SITE },
   class: { render: renderClass, title: r => `${r.cls.name} | ${SITE}` },
   quiz: { render: renderQuiz, title: () => `Quiz | ${SITE}` },
-  results: { render: renderResults, title: () => `Your matches | ${SITE}` }
+  results: { render: renderResults, title: () => `Your matches | ${SITE}` },
+  compare: {
+    render: renderCompare,
+    title: r => (r.a && r.b ? `${r.a.spec.name} ${r.a.cls.name} or ${r.b.spec.name} ${r.b.cls.name} | ${SITE}` : `Compare two specs | ${SITE}`)
+  }
 };
 
 let current = null;       // the route on screen
@@ -828,6 +1020,22 @@ document.addEventListener('click', e => {
   if (roleBtn) { setRoleFilter(roleBtn.dataset.role); return; }
 
   if (e.target.closest('#copyBtn')) copyResults();
+});
+
+/* ---------------- Compare: pickers ---------------- */
+
+// Changing a picker redraws in place: same history entry, same scroll, focus stays on the picker.
+document.addEventListener('change', e => {
+  const picker = e.target.closest('select[data-compare]');
+  if (!picker) return;
+  const a = document.getElementById('pickA').value;
+  const b = document.getElementById('pickB').value;
+  const query = [a && `a=${a}`, b && `b=${b}`].filter(Boolean).join('&');
+  history.replaceState({ id: entryId }, '', `#/compare${query ? `?${query}` : ''}`);
+  current = parseRoute(location.hash);
+  app.innerHTML = renderCompare(current);
+  document.title = VIEWS.compare.title(current);
+  document.getElementById(picker.id).focus({ preventScroll: true });
 });
 
 /* ---------------- Home: role filter ---------------- */

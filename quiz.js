@@ -168,4 +168,13 @@ function parseAnswers(str) {
   });
 }
 
-if (typeof module !== 'undefined') module.exports = { QUESTIONS, scoreQuiz, encodeAnswers, parseAnswers };
+// 'priest.holy' -> { cls, spec }, or null when the key does not name a real spec.
+function findSpec(key, classes) {
+  const parts = typeof key === 'string' ? key.split('.') : [];
+  if (parts.length !== 2) return null;
+  const cls = classes.find(c => c.id === parts[0]);
+  const spec = cls && cls.specs.find(s => s.id === parts[1]);
+  return spec ? { cls, spec } : null;
+}
+
+if (typeof module !== 'undefined') module.exports = { QUESTIONS, scoreQuiz, encodeAnswers, parseAnswers, findSpec };

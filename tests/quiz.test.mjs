@@ -4,8 +4,8 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
-const { CLASSES } = require('../data.js');
-const { QUESTIONS, scoreQuiz, encodeAnswers, parseAnswers } = require('../quiz.js');
+const { CLASSES, VIDEO, TAGS } = require('../data.js');
+const { QUESTIONS, scoreQuiz, encodeAnswers, parseAnswers, findSpec } = require('../quiz.js');
 
 // Build an answers array from { questionId: optionValue }. Missing questions are "no preference".
 function answers(picks) {
@@ -71,6 +71,35 @@ test('copy is clean', () => {
   assert.ok(!/strengths of the paladin/i.test(raw), 'copy-paste slip found');
   for (const typo of ['Afflciiton', 'Subtley', 'Warrio ', 'Enhance me']) assert.ok(!raw.includes(typo), typo);
   assert.ok(!/comments? section|like and subscribe/i.test(raw), 'video-only line found');
+});
+
+test('every change tag is a known tag', () => {
+  let tagged = 0;
+  for (const c of CLASSES) {
+    for (const row of [...c.changes, ...c.specs.flatMap(s => s.changes)]) {
+      if (row.tag === undefined) continue;
+      tagged++;
+      assert.ok(row.tag in TAGS, `${c.name}: ${row.term} has tag ${row.tag}`);
+    }
+  }
+  assert.ok(tagged > 100);
+});
+
+test('every class has a video chapter, in the order of the guide', () => {
+  const starts = CLASSES.map(c => VIDEO.chapters[c.id]);
+  for (const [i, s] of starts.entries()) assert.ok(Number.isInteger(s) && s > 0, CLASSES[i].name);
+  assert.deepEqual(starts, [...starts].sort((a, b) => a - b));
+  assert.ok(VIDEO.end > starts[starts.length - 1]);
+});
+
+test('findSpec reads class.spec keys and rejects anything else', () => {
+  const hit = findSpec('priest.holy', CLASSES);
+  assert.equal(hit.cls.name, 'Priest');
+  assert.equal(hit.spec.name, 'Holy');
+  assert.equal(findSpec('hunter.beast-mastery', CLASSES).spec.name, 'Beast Mastery');
+  for (const bad of ['', null, undefined, 'priest', 'priest.fire', 'monk.holy', 'a.b.c']) {
+    assert.equal(findSpec(bad, CLASSES), null, String(bad));
+  }
 });
 
 /* ---------------- scoring ---------------- */
