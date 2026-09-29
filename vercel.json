@@ -1,0 +1,19 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/classes",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/classes",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/classes/:path*",
+      "destination": "/index.html"
+    }
+  ]
+}

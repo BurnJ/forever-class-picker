@@ -2,19 +2,20 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Forever Class Guide</title>
+<base href="/">
+<title>Forever Guide</title>
 <meta name="description" content="All nine WoW Forever classes and 27 specs from Skyy's class picking guide: idle previews, talent trees and leveling builds to 30, plus a quiz to help you choose.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#0a1120">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Forever Class Guide">
+<meta property="og:site_name" content="Forever Guide">
 <meta property="og:title" content="Which class should you play in WoW Forever?">
 <meta property="og:description" content="All nine classes and 27 specs from Skyy's guide, with talent trees, leveling builds to 30 and a seven-question quiz.">
-<meta property="og:url" content="https://forever-class-picker.vercel.app/">
+<meta property="og:url" content="https://forever-class-picker.vercel.app/classes">
 <meta property="og:image" content="https://forever-class-picker.vercel.app/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Forever Class Guide">
+<meta property="og:image:alt" content="Forever Guide">
 <meta name="twitter:card" content="summary_large_image">
 <script defer src="/_vercel/insights/script.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,6 +24,7 @@
 <link rel="stylesheet" href="app.css">
 <script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') || 'forever';</script>
 <body>
+<header class="site-header" id="site-header"></header>
 <div id="app"></div>
 <div class="tip" id="tip" role="tooltip" hidden></div>
 
@@ -39,6 +41,8 @@
 <script src="data/talents/warlock.js"></script>
 <script src="data/talents/warrior.js"></script>
 <script src="data/leveling.js"></script>
-<script src="app.js"></script>
+<script src="shell.js"></script>
+<script src="modules/classes/classes.js"></script>
+<script>start();</script>
 </body>
 </html>

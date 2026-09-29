@@ -395,3 +395,23 @@ blockquote cite { display: block; font-style: normal; color: var(--label); font-
 .side h3 { font: 700 17px var(--font-display); color: var(--gold-mid); margin: 14px 0 6px; }
 .side ul { padding-left: 18px; margin: 0 0 12px; }
 @media (max-width: 640px) { .pickers, .sides { grid-template-columns: 1fr; } .match { flex-direction: column; } }
+
+/* ---------- site header (Forever Guide) ---------- */
+:root { --hdr: 46px; }
+.site-header { height: var(--hdr); display: flex; align-items: center; gap: 28px; padding: 0 clamp(16px, 3vw, 40px);
+  background: rgba(6, 10, 20, .96); border-bottom: 1px solid var(--line); position: relative; z-index: 6; }
+.brand { font: 700 22px/1 var(--font-display); color: var(--gold-bright); text-decoration: none; letter-spacing: .01em; }
+.site-nav { display: flex; gap: 4px; }
+.site-nav a { color: var(--label); text-decoration: none; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; padding: 6px 12px; }
+.site-nav a:hover { color: var(--text); }
+.site-nav a[aria-current="page"] { color: var(--text); box-shadow: inset 0 -2px 0 var(--gold-mid); }
+@media (min-width: 1000px) { .spec-page { height: calc(100vh - var(--hdr)); } }
+/* header budget: keep the one-screen pages fitting */
+:root { --hdr: 40px; }
+.brand { font-size: 20px; }
+@media (min-width: 1000px) {
+  .spec-page .bar { padding-top: 7px; padding-bottom: 7px; }
+  .panel { top: 1.8vh; max-height: calc(100% - 3.6vh); }
+  .hero { top: 3vh; max-height: calc(100% - 5vh); }
+}
+@media (min-width: 1000px) { .steps li { padding-top: .5vh; padding-bottom: .7vh; margin-bottom: .45vh; } }
