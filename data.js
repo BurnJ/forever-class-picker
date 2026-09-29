@@ -140,8 +140,7 @@ const CLASSES = [
     weaknesses: [
       { lead: 'Your forms lock away your spells', text: 'A bear or a cat cannot cast. Healing a companion or calling on nature\'s magic means leaving your form first, and choosing the wrong moment to shift can cost you the fight.' },
       { lead: 'Mana management', text: 'Shapeshifting, healing, and spellcasting all draw from the same pool, so changing forms freely can leave you short when you need a heal most.' },
-      { lead: 'Every role asks for its own build', text: 'Each form demands its own talents and equipment. Even within Feral, getting everything you want for both bear and cat comes with tradeoffs.' },
-      { lead: 'A lot to learn', text: 'Rage as a bear, energy and combo points as a cat, and mana as a caster. Versatility only pays off once you know each form well enough to pick the right one.' }
+      { lead: 'Every role asks for its own build', text: 'Each form demands its own talents and equipment. Even within Feral, getting everything you want for both bear and cat comes with tradeoffs.' }
     ],
     changes: [
       { tag: 'baseline', term: 'Omen of Clarity', text: 'Now baseline, so you no longer have to invest into Balance just to pick that up.' },
