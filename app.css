@@ -415,3 +415,4 @@ blockquote cite { display: block; font-style: normal; color: var(--label); font-
   .hero { top: 3vh; max-height: calc(100% - 5vh); }
 }
 @media (min-width: 1000px) { .steps li { padding-top: .5vh; padding-bottom: .7vh; margin-bottom: .45vh; } }
+.home:has(.classinfo[data-cls=""]:not([hidden])) .home-links { display: none; }

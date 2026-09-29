@@ -59,7 +59,7 @@ function home() {
       ${ROSTER.map(r => `<a class="frame" data-cls="${r.id}" href="/classes/${r.id}" title="${esc(cls(r.id).name)}"><img src="icons/${r.id}.png" alt="${esc(cls(r.id).name)}"></a>`).join('')}
     </nav>
     <nav class="home-links" aria-label="Help choosing">
-      <a class="btn" href="/classes/quiz">Not sure? Take the 7-question quiz</a>
+      <a class="btn" href="/classes/quiz">Not sure which class to play? Take the 7-question quiz</a>
       <a class="text-link" href="/classes/compare">Compare two specs</a>
     </nav>
     <section class="classinfo" id="classinfo" hidden></section></main>`;
@@ -77,12 +77,13 @@ function showClass(id) {
     if (el.classList.contains('card')) el.querySelector('.card-link').setAttribute('href', on ? '/classes' : `/classes/${el.dataset.cls}`);
   });
   const info = document.getElementById('classinfo');
-  if (!id) { info.hidden = true; info.innerHTML = ''; return; }
+  if (!id && info.hidden) { fillIntro(info); return; }
+  if (!id && info.dataset.cls === '') return;
   if (!info.hidden && info.dataset.cls !== id) {
     // crossfade: fade out, swap, fade in. Keep the reader at the top of the section if they were inside it.
     info.classList.add('fading');
     setTimeout(() => {
-      fillClass(info, id);
+      if (id) fillClass(info, id); else fillIntro(info);
       const top = info.getBoundingClientRect().top;
       if (top < 0) scrollTo({ top: scrollY + top - 80 });
       info.classList.remove('fading');
@@ -90,6 +91,37 @@ function showClass(id) {
     return;
   }
   fillClass(info, id);
+}
+
+// What this part of the site is, shown until a class is picked.
+function fillIntro(info) {
+  setClassColor({ color: 'var(--gold-mid)', text: 'var(--text)' });
+  const build = window.TALENTS && TALENTS.paladin ? TALENTS.paladin.build : '';
+  const chapter = typeof VIDEO !== 'undefined' ? `<a class="text-link" href="${videoUrl(0)}" target="_blank" rel="noopener">${esc(VIDEO.title)}</a>` : "Skyy's class guide";
+  info.innerHTML = `
+    <div class="glance intro">
+      <div class="who">
+        <h2>Find your class</h2>
+        <p class="pitch">Nine classes and 27 specs for WoW Forever, and what each one is like to play.</p>
+        <p>Pick a class above to see who it suits, its strengths and weaknesses, and its three specs. Each spec has a leveling build to level 30 and its full talent tree, and every ability and talent shows its real in-game tooltip.</p>
+      </div>
+      <div>
+        <h3>Where it comes from</h3>
+        <ul class="points">
+          <li><b>Skyy's guide.</b> The class and spec write-ups come from ${chapter}.</li>
+          <li><b>The beta itself.</b> Talents, abilities and numbers are taken straight from the WoW Forever beta${build ? ` (build ${esc(build)})` : ''}.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Not sure where to start?</h3>
+        <ul class="points">
+          <li><a class="text-link" href="/classes/quiz">Take the quiz</a>: seven quick questions about how you like to play, and your three best-matching specs.</li>
+          <li><a class="text-link" href="/classes/compare">Compare two specs</a> side by side.</li>
+        </ul>
+      </div>
+    </div>`;
+  info.hidden = false;
+  info.dataset.cls = '';
 }
 
 function fillClass(info, id) {
