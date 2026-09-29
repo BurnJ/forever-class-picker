@@ -447,3 +447,4 @@ blockquote cite { display: block; font-style: normal; color: var(--label); font-
 .gf-form legend { margin-bottom: 6px; }
 .gf-radio { display: inline-flex; align-items: center; gap: 6px; font-size: 17px; cursor: pointer; }
 .gf-form .gf-plain { margin-left: 0; }
+.build-pick { margin: 0 0 12px; } .build-pick a { padding: 5px 14px; }

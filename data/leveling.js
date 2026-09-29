@@ -9,30 +9,60 @@
 
 const LEVELING = {
   druid: {
-    feral: {
-      status: 'approved',
-      abilities: ['Moonfire', 'Bear Form', 'Maul', 'Swipe', 'Demoralizing Roar', 'Rejuvenation'],
-      gameplay: [
-        'Levels 1 to 10: don\'t just spam Wrath. Open with Wrath and Moonfire, then weave auto attacks with Moonfire. Keep Mark of the Wild and Thorns up.',
-        'From level 10, level in Bear Form. Pull with Moonfire, shift, and Maul whenever you have rage. Add Primal Bite once you have it.',
-        'Heal between pulls. A Rejuvenation before you pull lets you chain several fights as a bear.',
-        'On packs, Swipe hits 3 enemies and Demoralizing Roar weakens their attacks. Enrage gives you rage to open with.',
-        'In dungeons, Growl taunts back anything that leaves you, and Faerie Fire strips a boss\'s armor for your whole group.',
-        'Plenty of utility: Entangling Roots, Remove Curse, Abolish Poison, and Hibernate for beasts and dragons.'
-      ],
-      steps: [
-        { text: '5 points in Ferocity: Maul, Swipe and Primal Bite cost 5 less rage.',
-          points: { 'Ferocity': 5 } },
-        { text: '2 points in Feral Swiftness for more dodge, and 3 in Feral Instinct for a harder-hitting Swipe.',
-          points: { 'Feral Swiftness': 2, 'Feral Instinct': 3 } },
-        { text: 'Feral Charge to close in and interrupt, then 2 points each in Savage Fury and Sharpened Claws for more damage and crit.',
-          points: { 'Feral Charge': 1, 'Savage Fury': 2, 'Sharpened Claws': 2 } },
-        { text: 'Primal Bite, 3 points in Predatory Strikes for more attack power, and 1 in Heart of the Wild.',
-          points: { 'Primal Bite': 1, 'Predatory Strikes': 3, 'Heart of the Wild': 1 } },
-        { text: 'Your level 30 point is Leader of the Pack: 3% more crit for you and your party.',
-          points: { 'Leader of the Pack': 1 } }
-      ]
-    },
+    feral: [
+      {
+        id: 'bear',
+        label: 'Bear',
+        status: 'approved',
+        abilities: ['Moonfire', 'Bear Form', 'Maul', 'Swipe', 'Demoralizing Roar', 'Rejuvenation'],
+        gameplay: [
+          'Levels 1 to 10: don\'t just spam Wrath. Open with Wrath and Moonfire, then weave auto attacks with Moonfire. Keep Mark of the Wild and Thorns up.',
+          'From level 10, level in Bear Form. Pull with Moonfire, shift, and Maul whenever you have rage. Add Primal Bite once you have it.',
+          'Heal between pulls. A Rejuvenation before you pull lets you chain several fights as a bear.',
+          'On packs, Swipe hits 3 enemies and Demoralizing Roar weakens their attacks. Enrage gives you rage to open with.',
+          'In dungeons, Growl taunts back anything that leaves you, and Faerie Fire strips a boss\'s armor for your whole group.',
+          'Plenty of utility: Entangling Roots, Remove Curse, Abolish Poison, and Hibernate for beasts and dragons.'
+        ],
+        steps: [
+          { text: '5 points in Ferocity: Maul, Swipe and Primal Bite cost 5 less rage.',
+            points: { 'Ferocity': 5 } },
+          { text: '2 points in Feral Swiftness for more dodge, and 3 in Feral Instinct for a harder-hitting Swipe.',
+            points: { 'Feral Swiftness': 2, 'Feral Instinct': 3 } },
+          { text: 'Feral Charge to close in and interrupt, then 2 points each in Savage Fury and Sharpened Claws for more damage and crit.',
+            points: { 'Feral Charge': 1, 'Savage Fury': 2, 'Sharpened Claws': 2 } },
+          { text: 'Primal Bite, 3 points in Predatory Strikes for more attack power, and 1 in Heart of the Wild.',
+            points: { 'Primal Bite': 1, 'Predatory Strikes': 3, 'Heart of the Wild': 1 } },
+          { text: 'Your level 30 point is Leader of the Pack: 3% more crit for you and your party.',
+            points: { 'Leader of the Pack': 1 } }
+        ]
+      },
+      {
+        id: 'cat',
+        label: 'Cat',
+        status: 'approved',
+        abilities: ['Cat Form', 'Prowl', 'Shred', 'Rake', 'Claw', 'Rip'],
+        gameplay: [
+          'Keep Mark of the Wild on your party and Thorns on whoever is taking hits. Thorns adds threat for the person wearing it.',
+          'Before 10: keep Moonfire on enemies, Rejuvenation on yourself when hurt, Wrath with spare mana, and finish with auto attacks. Two enemies at a time works well.',
+          'From 10, as a bear: heal up first, Moonfire two enemies, then Enrage into Demoralizing Roar (skip it against casters). Swipe on several enemies, Maul on one.',
+          'From 20, as a cat: fight one enemy at a time. Pool energy in Cat Form, Prowl up behind the target and open with Shred (from 22).',
+          'Rake (from 24) anything that will live 6+ sec, build combo points with Claw, and finish with Rip. Ferocious Bite comes at 32.',
+          'Between pulls, heal with Rejuvenation, then Regrowth, then Healing Touch.'
+        ],
+        steps: [
+          { text: '5 points in Ferocity: your bear and cat attacks cost less.',
+            points: { 'Ferocity': 5 } },
+          { text: '3 points in Heart of the Wild for more mana and form stats, and 2 in Feral Swiftness for a fast cat and more dodge.',
+            points: { 'Heart of the Wild': 3, 'Feral Swiftness': 2 } },
+          { text: 'Feral Charge to close in and interrupt, then 2 points each in Sharpened Claws and Savage Fury.',
+            points: { 'Feral Charge': 1, 'Sharpened Claws': 2, 'Savage Fury': 2 } },
+          { text: '3 points in Predatory Strikes for more attack power in your forms, and 2 in Blood Frenzy.',
+            points: { 'Predatory Strikes': 3, 'Blood Frenzy': 2 } },
+          { text: 'Your level 30 point is Leader of the Pack: 3% more crit for you and your party.',
+            points: { 'Leader of the Pack': 1 } }
+        ]
+      }
+    ],
     restoration: {
       status: 'approved',
       abilities: ['Rejuvenation', 'Regrowth', 'Healing Touch', 'Swiftmend', "Nature's Swiftness", 'Abolish Poison'],

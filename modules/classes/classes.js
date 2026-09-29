@@ -1,5 +1,5 @@
 'use strict';
-/* The class module: /classes, /classes/<class>, /classes/<class>/<spec>[/leveling], /classes/quiz|results|compare.
+/* The class module: /classes, /classes/<class>, /classes/<class>/<spec>[/leveling[/<build>]], /classes/quiz|results|compare.
    Reads Skyy's CLASSES (data.js), QUESTIONS (quiz.js), TALENTS (data/talents/*.js), LEVELING (data/leveling.js). */
 
 // file = footage name in out/ (female adds _f); null = not recorded yet
@@ -156,6 +156,11 @@ function fillClass(info, id) {
 // Skyy's spec id -> the game's tree ("feral" matches "feral-combat")
 const findTree = (talents, specId) => talents.specs.find(t => t.id === specId || t.id.split('-')[0] === specId);
 
+// A spec's leveling builds: one object, or a list of { id, label, ... } when it has several (e.g. bear or cat Feral).
+const buildsFor = (cls, spec) => {
+  const b = typeof LEVELING !== 'undefined' && LEVELING[cls] && LEVELING[cls][spec];
+  return !b ? [] : Array.isArray(b) ? b : [b];
+};
 const isPick = (cls, spec) => typeof LEVELING_PICK !== 'undefined' && LEVELING_PICK[cls] === spec;
 
 function setClassColor(c) {
@@ -168,12 +173,13 @@ function specIcon(id, specId) {
 }
 
 /* ---------- class page ---------- */
-function classPage(id, specId, leveling) {
+function classPage(id, specId, leveling, variant) {
   const c = cls(id), r = ROSTER.find(r => r.id === id);
   const spec = c.specs.find(s => s.id === specId) || c.specs[0];
   const talents = window.TALENTS && TALENTS[id];
   const tree = talents && findTree(talents, spec.id);
-  const build = typeof LEVELING !== 'undefined' && LEVELING[id] && LEVELING[id][spec.id];
+  const builds = buildsFor(id, spec.id);
+  const build = builds.find(b => b.id === variant) || builds[0];
   setClassColor(c);
   tipCtx = {
     abilities: (talents && talents.abilities) || {},
@@ -201,7 +207,7 @@ function classPage(id, specId, leveling) {
         <div class="stage">
           ${r.file ? `<img data-cls="${id}" src="${stillSrc(r)}" alt="${esc(r.race)} ${esc(c.name)}">` : `<div class="nostill">${esc(r.race)} ${esc(c.name)}: footage not recorded yet</div>`}
         </div>
-        <div class="panels">${leveling ? levelingPanels(c, spec, tree, build, talents) : specPanels(c, spec)}</div>
+        <div class="panels">${leveling ? levelingPanels(c, spec, tree, build, talents, builds) : specPanels(c, spec)}</div>
       </div>
     </div>`;
   if (leveling && tree) wireTree(tree, build, talents);
@@ -248,7 +254,7 @@ function specPanels(c, spec) {
   </section>`;
 }
 
-function levelingPanels(c, spec, tree, build, talents) {
+function levelingPanels(c, spec, tree, build, talents, builds = []) {
   const draft = build && build.status === 'draft' ? '<span class="draft">Draft</span>' : '';
   const play = build
     ? `<h3 class="first">Key abilities</h3>
@@ -279,6 +285,8 @@ function levelingPanels(c, spec, tree, build, talents) {
     <section class="panel left" aria-label="Gameplay">
       <h2>${esc(spec.name)} at 1–30${draft}</h2>
       <div class="role">${esc(spec.role)}</div>
+      ${builds.length > 1 ? `<nav class="seg build-pick" aria-label="Leveling build">${builds.map(b =>
+        `<a href="/classes/${c.id}/${spec.id}/leveling/${b.id}" aria-current="${b === build}">${esc(b.label)}</a>`).join('')}</nav>` : ''}
       ${play}
     </section>
     <section class="panel right level" aria-label="Level 30 talents">
@@ -490,7 +498,7 @@ registerModule({
     }
     const known = first && cls(first) && ROSTER.some(r => r.id === first);
     if (known && spec) {
-      classPage(first, spec, mode === 'leveling');
+      classPage(first, spec, mode === 'leveling', parts[3]);
       scrollTo(0, 0);
     } else {
       tipCtx = null;
@@ -506,7 +514,11 @@ registerModule({
       out.push({ path: `/classes/${r.id}`, kind: 'class' });
       for (const sp of cls(r.id).specs) {
         out.push({ path: `/classes/${r.id}/${sp.id}`, kind: 'spec' });
-        if (window.TALENTS && TALENTS[r.id]) out.push({ path: `/classes/${r.id}/${sp.id}/leveling`, kind: 'spec' });
+        if (window.TALENTS && TALENTS[r.id]) {
+          const bs = buildsFor(r.id, sp.id);
+          if (bs.length > 1) bs.forEach(b => out.push({ path: `/classes/${r.id}/${sp.id}/leveling/${b.id}`, kind: 'spec' }));
+          else out.push({ path: `/classes/${r.id}/${sp.id}/leveling`, kind: 'spec' });
+        }
       }
     }
     return out;
