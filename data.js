@@ -414,7 +414,7 @@ const CLASSES = [
           { tag: 'new', capstone: true, term: 'Thousand Cuts', text: 'The new capstone. Rupture ticks reduce the energy cost of your next Hemorrhage or Backstab, stacking up to five times. Keeping your bleed going helps you afford the attacks you use to build more combo points.' },
           { tag: 'improved', term: 'Hemorrhage', text: 'Also increases Rupture damage, giving those abilities another reason to work together, even if you are building around daggers.' },
           { tag: 'new', term: 'Cutthroat', text: 'A deep Subtlety talent giving Backstab a 15% chance to let you use Ambush without being stealthed, within the next ten seconds. Improved Ambush also moves earlier in the tree.' },
-          { tag: 'moved', term: 'Premeditation', text: 'Moves to the 21-point talent tier. Combined with Cold Blood moving earlier in Assassination, you can now pick up both and still have points left to spend elsewhere.' }
+          { tag: 'moved', term: 'Premeditation', text: 'Moves to the 16-point talent tier. Combined with Cold Blood moving earlier in Assassination, you can now pick up both and still have points left to spend elsewhere.' }
         ],
         take: 'Man, Cutthroat is a pretty fun proc to look out for. You are fighting somebody, using Backstab, and suddenly you have an opportunity to throw an Ambush into the fight without having to restealth. Sub has some interesting choices here, especially for PvP.'
       }
