@@ -4,9 +4,9 @@
 
 const GOLD_IMG = n => `modules/gold-farming/img/${n}.png`;
 const SEEDS = [
-  { id: 'copper', name: 'Copper Sapling', gold: '10', price: '$4.99', icon: 'copper', note: 'Starter seed. Mostly copper, emotionally gold.' },
-  { id: 'silver', name: 'Silverleaf Bush', gold: '100', price: '$19.99', icon: 'silver', note: 'Most popular. Needs full sun and zero Blizzard GMs nearby.' },
-  { id: 'hoard', name: "Dragon's Hoard", gold: '1,000', price: '$49.99', icon: 'chest', note: 'Best value. Comes with a very small, very angry dragon.' },
+  { id: 'seedling', name: 'Gold Seedling', gold: '10', price: '$4.99', icon: 'goldcoins', note: 'A starter crop. Enough for a few stacks of Linen Cloth.' },
+  { id: 'shrub', name: 'Gold Shrub', gold: '100', price: '$19.99', icon: 'goldstack', note: 'Most popular. Needs full sun and zero Blizzard GMs nearby.' },
+  { id: 'orchard', name: 'Gold Orchard', gold: '1,000', price: '$49.99', icon: 'chest', note: 'Best value. Epic mount money, fresh off the branch.' },
 ];
 const STAGES = [
   { img: 'seed', label: 'Freshly planted', line: 'You press the seed into the soil of Elwynn Forest. Somewhere, a gnoll is watching.' },
