@@ -335,7 +335,7 @@ const CLASSES = [
         ],
         changes: [
           { tag: 'new', term: 'Strider Kick', text: 'An instant attack dealing 100% melee damage on an eight-second cooldown, giving you a regular button to press while you are up close.' },
-          { tag: 'new', term: 'Expose Prey', text: 'The new 21-point talent gives your attacks against a target with your Hunter's Mark a 10% chance to activate Mongoose Bite.' },
+          { tag: 'new', term: 'Expose Prey', text: 'The new 21-point talent gives your attacks against a target with your Hunter\'s Mark a 10% chance to activate Mongoose Bite.' },
           { tag: 'new', capstone: true, term: 'Lacerating Strikes', text: 'The new capstone makes Mongoose Bite apply a bleed. Expose Prey can activate Mongoose Bite for you, and that Mongoose Bite adds damage over time.' },
           { tag: 'new', term: 'Predator\'s Edge', text: 'Increases melee critical-strike damage and offhand weapon damage, so there is clear support for dual wielding.' },
           { tag: 'improved', term: 'Traps and roots', text: 'Entrapment now roots targets hit by any trap for five seconds. Improved Wing Clip keeps its 20% root chance but costs three talent points instead of five. Surefooted reduces the duration of movement-impairing effects by 30%.' }
