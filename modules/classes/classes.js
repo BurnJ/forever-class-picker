@@ -477,7 +477,7 @@ function comparePage(a, b) {
 /* ---------- routes ---------- */
 registerModule({
   id: 'classes',
-  label: 'Classes',
+  label: 'Class Picker',
   render(parts, query) {
     const [first, spec, mode] = parts;
     if (first === 'quiz' || first === 'results' || first === 'compare') {

@@ -40,6 +40,7 @@ function route() {
   if (!parts.length) { history.replaceState(null, '', '/classes' + location.search); return route(); }
   const mod = MODULES.find(m => m.id === parts[0]) || MODULES[0];
   renderHeader(mod.id);
+  document.title = `${mod.label} | ${SITE}`;
   document.body.dataset.module = mod.id;
   mod.render(mod.id === parts[0] ? parts.slice(1) : [], new URLSearchParams(location.search));
 }
