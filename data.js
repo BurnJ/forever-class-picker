@@ -186,7 +186,6 @@ const CLASSES = [
         ],
         changes: [
           { tag: 'new', term: 'Eclipse', text: 'Wrath reduces the cast time of your next two Starfires by half a second, stacking up to four times. You build that effect with Wrath, then switch over and send out two substantially faster Starfires. Casting one spell helps set up the other.' },
-          { tag: 'new', term: 'Balance of Nature', text: 'Increases the damage of the opposite effect, whether solar or lunar, by 1%, stacking up to 10 times. It creates a really nice gameplay loop for Balance.' },
           { tag: 'moved', term: 'Insect Swarm', text: 'Moves from Restoration into Balance, alongside talents supporting periodic damage and healing, giving the damage-over-time side of the tree more attention.' }
         ]
       }
