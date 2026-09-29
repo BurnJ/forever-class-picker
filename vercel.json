@@ -7,6 +7,14 @@
     {
       "source": "/classes/:path*",
       "destination": "/index.html"
+    },
+    {
+      "source": "/gold-farming",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/gold-farming/:path*",
+      "destination": "/index.html"
     }
   ]
 }
