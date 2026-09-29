@@ -107,7 +107,7 @@ const CLASSES = [
           'With well-timed seals and strikes you can deal devastating attacks, but even with your attention on the enemy, your job is to always assist a companion who is in need of your aid. Knowing when to interrupt your assault with a blessing or heal is part of mastering Retribution.'
         ],
         changes: [
-          { tag: 'new', capstone: true, term: 'Twist of the Light', text: 'The new capstone. Replacing an eligible seal gives you an echo of the seal you just replaced. Your next melee attack then applies that old seal\'s effect and consumes the echo.' },
+          { tag: 'new', capstone: true, term: 'Twist of Light', text: 'The new capstone. Replacing an eligible seal gives you an echo of the seal you just replaced. Your next melee attack then applies that old seal\'s effect and consumes the echo.' },
           { term: 'Seal twisting, made forgiving', text: 'Say you have Seal of Command active, then switch to Seal of Righteousness. Your next swing can carry that Command effect along with your new seal. You are carrying the effect into your next attack instead of relying on that tiny timing window.' },
           { term: 'Shockadin', text: 'With Holy Shock moving earlier in Holy and Intellect scaling available deeper in Ret, there is potential to combine the two for a build that leans more into spell damage.' }
         ]
@@ -158,7 +158,7 @@ const CLASSES = [
         ],
         changes: [
           { tag: 'new', term: 'Primal Bite', text: 'Bears gain another major attack to work into their tanking.' },
-          { tag: 'new', capstone: true, term: 'Berserk, as a bear', text: 'The new capstone removes Mangle\'s cooldown and lets it hit up to three targets. When you have several enemies in front of you, you have a window where you can repeatedly hit them with Mangle.' },
+          { tag: 'new', capstone: true, term: 'Berserk, as a bear', text: 'The new capstone removes Primal Bite\'s cooldown and lets it hit up to three targets. When you have several enemies in front of you, you have a window where you can repeatedly hit them with Primal Bite.' },
           { tag: 'new', capstone: true, term: 'Berserk, as a cat', text: 'Increases the critical-strike chance of your combo-point-generating abilities by 100%, giving you a major burst window. Berserk lasts 15 seconds and also makes you immune to fear.' },
           { term: 'Bear or cat', text: 'There are enough separate damage and defensive investments that you will have to make some choices between maximizing cat and bear. You can still build around using both forms, but getting everything you want for both roles comes with tradeoffs.' }
         ]
