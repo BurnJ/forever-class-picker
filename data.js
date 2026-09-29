@@ -234,7 +234,7 @@ const CLASSES = [
         ],
         changes: [
           { tag: 'improved', term: 'Shadow Focus', text: 'Now grants spell hit directly.' },
-          { tag: 'mixed', term: 'Improved Mind Flay', text: 'Adds ten yards of range and 20% more damage. The tradeoff is that its slow drops from 50% to 20%, so you are giving up some control for better damage and reach.' },
+          { tag: 'mixed', term: 'Improved Mind Flay', text: 'Adds five yards of range and 20% more damage. The tradeoff is that its slow drops from 50% to 20%, so you are giving up some control for better damage and reach.' },
           { tag: 'improved', term: 'Devouring Plague', text: 'Gets talent support that reduces its mana cost and allows it to jump to nearby targets if they die with the debuff active, giving your newly baseline disease more potential against multiple enemies.' },
           { tag: 'moved', term: 'Silence and Blackout', text: 'Silence no longer requires the Psychic Scream cooldown-reduction talent, while that cooldown reduction now sits behind Blackout.' }
         ]
@@ -261,7 +261,7 @@ const CLASSES = [
         changes: [
           { tag: 'new', capstone: true, term: 'Prayer of Mending', text: 'The new capstone. A reactive heal that triggers when its target takes damage and then jumps to another party or raid member.' },
           { tag: 'new', term: 'Binding Heal', text: 'Heals yourself and somebody else with the same cast. When you and your tank are both getting beat up, that gives you a way to help both of you at once.' },
-          { tag: 'new', term: 'Litany of Light', text: 'Rewards you for changing which healing spell you use. If your previous heal was a different spell, you recover mana equal to 10% of the base mana cost of the spell you just cast.' },
+          { tag: 'new', term: 'Litany of Light', text: 'Rewards you for changing which healing spell you use. If your previous heal was a different spell, you recover mana equal to 5% of the base mana cost of the spell you just cast.' },
           { tag: 'improved', term: 'Spirit of Redemption', text: 'Now lasts 15 seconds instead of ten, giving you another five seconds to keep healing after you die. Hopefully you won\'t need it, but when a pull goes wrong, those extra seconds can matter.' }
         ]
       }
