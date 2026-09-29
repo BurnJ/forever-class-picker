@@ -440,3 +440,11 @@ blockquote cite { display: block; font-style: normal; color: var(--label); font-
 .gf-reveal .results-actions { justify-content: center; }
 .gf-disclaimer { text-align: center; margin-top: 28px; }
 @media (max-width: 700px) { .gf-seeds { grid-template-columns: 1fr; } .gf-plot { flex-direction: column; text-align: center; } }
+.gf-form { flex: 1; display: grid; gap: 8px; justify-items: start; }
+.gf-form label[for], .gf-form legend { color: var(--label); font-size: 14px; letter-spacing: .06em; text-transform: uppercase; }
+.gf-form input#gf-name { font: inherit; font-size: 18px; padding: 8px 12px; width: min(320px, 100%); background: var(--panel-bg); color: var(--text); border: 1px solid var(--line); }
+.gf-form input#gf-name:focus { outline: 2px solid var(--gold-mid); }
+.gf-form fieldset { border: 0; padding: 0; margin: 8px 0 12px; display: flex; gap: 16px; flex-wrap: wrap; }
+.gf-form legend { margin-bottom: 6px; }
+.gf-radio { display: inline-flex; align-items: center; gap: 6px; font-size: 17px; cursor: pointer; }
+.gf-form .gf-plain { margin-left: 0; }
