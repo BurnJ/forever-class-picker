@@ -330,8 +330,8 @@ const CLASSES = [
         id: 'survival', name: 'Survival', role: 'Melee damage',
         roles: ['melee'], range: 'melee', pet: 1, complexity: 2, support: 1, solo: 3, themes: ['beasts', 'nature'],
         intro: [
-          'The Survival Hunter follows their quarry into striking distance, armed with blades, traps, and the instincts of a seasoned tracker. In Forever, this is a melee damage specialization, fighting close enough to exploit every opening.',
-          'Survival is where the class changes the most, because this tree has been reworked around melee attacks, traps, and procs.'
+          'The Survival Hunter follows their quarry into striking distance, armed with blades, traps, and the instincts of a seasoned tracker. This is a melee damage specialization, fighting close enough to exploit every opening.',
+          'The tree is built around melee attacks, traps, and procs.'
         ],
         changes: [
           { tag: 'new', term: 'Strider Kick', text: 'An instant attack dealing 100% melee damage on an eight-second cooldown, giving you a regular button to press while you are up close.' },
