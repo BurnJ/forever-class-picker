@@ -460,7 +460,7 @@ const CLASSES = [
           'The Arcane Mage draws upon raw magical power, gathering strength with each spell until it is ready to be unleashed. This is a ranged damage specialization built around escalating power and careful mana use, where pressing the attack carries an increasing cost.'
         ],
         changes: [
-          { tag: 'new', term: 'Arcane Blast', text: 'On the third row. Arcane mages rejoice, you actually have an ability to cast! Casting it builds an effect that increases the damage of your other spells, but also increases the mana cost of Arcane Blast itself. That stacks up to four times and lasts until you cast a different spell.' },
+          { tag: 'new', term: 'Arcane Blast', text: 'On the third row. Arcane mages rejoice, you actually have an ability to cast! Casting it builds an effect that increases the damage of your other spells, but also increases the mana cost of Arcane Blast itself. That stacks up to four times and lasts 8 seconds or until you cast a different damage spell.' },
           { tag: 'new', term: 'Missile Barrage', text: 'Gives Arcane Blast a 40% chance to make your next Arcane Missiles free and channel twice as quickly. You build up with Arcane Blast, look for that proc, then put the extra damage into a much faster, free Arcane Missiles.' },
           { term: 'The decision', text: 'If you keep casting Blast without getting the proc, that mana cost starts becoming a problem. Do you try again, or cast something else to clear those stacks before you burn through too much mana?' },
           { tag: 'improved', term: 'Range and hit', text: 'Arcane gets an additional six yards of range through talents, while Arcane Focus now grants spell hit directly. With Blast and Missile Barrage fairly early in the tree, there is room to experiment in hybrid builds too.' }
@@ -474,7 +474,7 @@ const CLASSES = [
         ],
         changes: [
           { tag: 'new', term: 'Hot Streak', text: 'Works a little differently from the instant Pyroblasts you might be familiar with. Critical hits from Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce Pyroblast\'s cast time by 25%, stacking up to three times. At full stacks, that is a 75% shorter Pyroblast cast.' },
-          { tag: 'new', term: 'Wake of Fire', text: 'Rewards you for finishing an enemy with Fire Blast by reducing its cooldown and increasing the critical-strike chance of your next Fire Blast. A reason to think about how you finish a target, especially when leveling.' },
+          { tag: 'new', term: 'Wake of Fire', text: 'Reduces the cooldown of Fire Blast, and killing an enemy increases the critical-strike chance of your next Fire Blast. A nice boost when you are chaining kills, especially when leveling.' },
           { tag: 'improved', term: 'Combustion', text: 'Now lasts until you land four critical strikes instead of three, giving you another crit before the effect ends.' }
         ]
       },
@@ -487,7 +487,7 @@ const CLASSES = [
         changes: [
           { tag: 'new', term: 'Ice Lance and Fingers of Frost', text: 'Another instant damage spell, and procs that let you take advantage of frozen-target interactions. Ice Lance gives you an option to deal damage while moving as well.' },
           { tag: 'moved', term: 'Cold Snap', text: 'Moves down to the 21-point talent tier, so Fire and Arcane builds need a bigger investment if they want to pick it up.' },
-          { tag: 'nerf', term: 'Improved Blizzard', text: 'Its slow drops from 65% to 45%. With Permafrost included, that takes the maximum slow from 75% down to 55%. Enemies move through your Blizzard faster, so you will have less room for error when kiting a big pack.' },
+          { tag: 'nerf', term: 'Improved Blizzard', text: 'Its slow drops from 65% to 40%. With Permafrost included, that takes the maximum slow from 75% down to 50%. Enemies move through your Blizzard faster, so you will have less room for error when kiting a big pack.' },
           { term: 'Fire and Frost hybrids', text: 'There is potential in combining Hot Streak\'s faster Pyroblasts with Fingers of Frost and Ice Lance, especially for PvP. We will have to see how those builds come together.' }
         ]
       }
