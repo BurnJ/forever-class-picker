@@ -640,7 +640,7 @@ const CLASSES = [
           { tag: 'new', term: 'Focused Rage', text: 'Reduces the rage cost of your offensive abilities by three. You are getting more resources from defending yourself and spending less when you attack.' },
           { tag: 'new', term: 'Vanguard', text: 'Allows you to Charge in Defensive Stance. Improved Thunder Clap also moves into the Protection tree.' },
           { tag: 'mixed', term: 'Improved Revenge', text: 'Now increases its damage by 60%, although it loses the stun chance.' },
-          { tag: 'mixed', term: 'Cooldowns', text: 'Improved Disarm reduces Disarm\'s cooldown, while Improved Shield Wall takes ten minutes off Shield Wall\'s cooldown instead of extending its duration.' }
+          { tag: 'mixed', term: 'Cooldowns', text: 'Improved Disarm reduces Disarm\'s cooldown, while Improved Shield Wall takes eleven minutes off Shield Wall\'s cooldown instead of extending its duration.' }
         ]
       }
     ],
