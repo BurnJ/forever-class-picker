@@ -215,7 +215,7 @@ const LEVELING = {
         'Early on, open with Frostbolt to slow the enemy, then finish with Fireball. With Flame Throwing, you can open with Fireball from max range and follow with a rank 1 Frostbolt.',
         'Once Ignite is up, your crits keep burning, and you can often kill enemies before they reach you.',
         'From 26, open with Fireball, then cast Scorch: it is your fastest spell, and each one stacks more fire damage onto the target.',
-        'Your crits build Hot Streak. At 3 stacks, Pyroblast casts 75% faster: fire it off for your biggest hit.',
+        'Your crits build Heating Up. At 3 stacks, Pyroblast casts 75% faster: fire it off for your biggest hit.',
         'At 30, Blast Wave hits every enemy around you and slows them. It shines in dungeons and on packs.'
       ],
       steps: [
@@ -223,8 +223,8 @@ const LEVELING = {
           points: { 'Improved Fireball': 5 } },
         { text: '2 points in Flame Throwing for 6 yards more range, then 5 in Ignite: your fire crits keep burning.',
           points: { 'Flame Throwing': 2, 'Ignite': 5 } },
-        { text: '2 points in Burning Soul so damage doesn\'t push back your casts, then Pyroblast and Hot Streak.',
-          points: { 'Burning Soul': 2, 'Pyroblast': 1, 'Hot Streak': 1 } },
+        { text: '2 points in Burning Soul so damage doesn\'t push back your casts, then Pyroblast and Heating Up.',
+          points: { 'Burning Soul': 2, 'Pyroblast': 1, 'Heating Up': 1 } },
         { text: '3 points in Improved Scorch, then the last point of Burning Soul.',
           points: { 'Improved Scorch': 3, 'Burning Soul': 1 } },
         { text: 'Your level 30 point is Blast Wave.',
@@ -293,8 +293,8 @@ const LEVELING = {
           points: { 'Improved Renew': 3, 'Holy Specialization': 2 } },
         { text: '5 points in Divine Fury for faster Heal casts.',
           points: { 'Divine Fury': 5 } },
-        { text: 'Switch to the Discipline tree: 5 points in Twin Disciplines for stronger instant heals, then 3 in Improved Power Word: Shield.',
-          points: { 'Twin Disciplines': 5, 'Improved Power Word: Shield': 3 } },
+        { text: 'Switch to the Discipline tree: 5 points in Twin Disciplines for stronger instant heals, then 3 in Mental Strength for more Intellect and a bigger mana pool.',
+          points: { 'Twin Disciplines': 5, 'Mental Strength': 3 } },
         { text: 'Back in Holy: finish Holy Specialization.',
           points: { 'Holy Specialization': 3 } }
       ]
@@ -460,8 +460,8 @@ const LEVELING = {
           points: { 'Concussion': 5 } },
         { text: 'Elemental Focus, 3 points in Elemental Alacrity for a faster Lightning Bolt, and 2 in Reverberation.',
           points: { 'Elemental Focus': 1, 'Elemental Alacrity': 3, 'Reverberation': 2 } },
-        { text: '3 points in Eye of the Storm so hits barely push back your casts, then Call of Thunder.',
-          points: { 'Eye of the Storm': 3, 'Call of Thunder': 1 } },
+        { text: '3 points in Eye of the Storm so hits barely push back your casts, then 1 in Call of Flame for a stronger, longer Flame Shock.',
+          points: { 'Eye of the Storm': 3, 'Call of Flame': 1 } },
         { text: 'Your level 30 point is Lightning Overload: Lightning Bolt can fire a free second bolt.',
           points: { 'Lightning Overload': 1 } }
       ]
@@ -530,10 +530,10 @@ const LEVELING = {
           points: { 'Improved Corruption': 5 } },
         { text: '3 points in Improved Drains for a stronger Drain Life, and 2 in Suppression for more hit.',
           points: { 'Improved Drains': 3, 'Suppression': 2 } },
-        { text: '3 points in Fel Concentration so damage can\'t interrupt your drains, and 2 in Malediction.',
-          points: { 'Fel Concentration': 3, 'Malediction': 2 } },
-        { text: '2 points in Nightfall for free instant Shadow Bolts, then 3 more in Malediction.',
-          points: { 'Nightfall': 2, 'Malediction': 3 } },
+        { text: '3 points in Fel Concentration so damage can\'t interrupt your drains, and 2 in Improved Bane of Agony.',
+          points: { 'Fel Concentration': 3, 'Improved Bane of Agony': 2 } },
+        { text: '2 points in Nightfall for free instant Shadow Bolts, then 3 in Pandemic for harder-hitting damage-over-time crits.',
+          points: { 'Nightfall': 2, 'Pandemic': 3 } },
         { text: 'Your level 30 point is Siphon Life: one more damage over time that heals you.',
           points: { 'Siphon Life': 1 } }
       ]
@@ -556,8 +556,8 @@ const LEVELING = {
           points: { 'Cruelty': 5 } },
         { text: '5 points in Unbridled Wrath: your swings generate extra rage.',
           points: { 'Unbridled Wrath': 5 } },
-        { text: '3 points in Improved Cleave for a cheaper Cleave, and 2 in Boundless Rage.',
-          points: { 'Improved Cleave': 3, 'Boundless Rage': 2 } },
+        { text: '3 points in Blood Craze for health back after big hits, 1 in Piercing Howl to slow runners, and 1 in Furious Precision.',
+          points: { 'Blood Craze': 3, 'Piercing Howl': 1, 'Furious Precision': 1 } },
         { text: '5 points in Enrage for more damage with a two-handed weapon.',
           points: { 'Enrage': 5 } },
         { text: 'Your level 30 point is Death Wish.',

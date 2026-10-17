@@ -448,3 +448,11 @@ blockquote cite { display: block; font-style: normal; color: var(--label); font-
 .gf-radio { display: inline-flex; align-items: center; gap: 6px; font-size: 17px; cursor: pointer; }
 .gf-form .gf-plain { margin-left: 0; }
 .build-pick { margin: 0 0 12px; } .build-pick a { padding: 5px 14px; }
+
+/* three header sections need to fit a phone */
+@media (max-width: 560px) {
+  .site-header { gap: 10px; padding: 0 12px; }
+  .brand { font-size: 17px; white-space: nowrap; }
+  .site-nav { gap: 0; }
+  .site-nav a { font-size: 12px; letter-spacing: .03em; padding: 6px 6px; white-space: nowrap; }
+}

@@ -9,6 +9,14 @@
       "destination": "/index.html"
     },
     {
+      "source": "/keybinds",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/keybinds/:path*",
+      "destination": "/index.html"
+    },
+    {
       "source": "/gold-farming",
       "destination": "/index.html"
     },
