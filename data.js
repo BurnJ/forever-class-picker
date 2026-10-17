@@ -472,8 +472,7 @@ const CLASSES = [
           'The Fire Mage meets opposition with an incantation and a rising blaze. This is a ranged damage specialization that turns critical strikes into opportunities, building toward faster Pyroblasts as flames consume the enemy.'
         ],
         changes: [
-          { tag: 'new', term: 'Hot Streak', text: 'Works a little differently from the instant Pyroblasts you might be familiar with. Critical hits from Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce Pyroblast\'s cast time by 25%, stacking up to three times. At full stacks, that is a 75% shorter Pyroblast cast.' },
-          { tag: 'new', term: 'Wake of Fire', text: 'Reduces the cooldown of Fire Blast, and killing an enemy increases the critical-strike chance of your next Fire Blast. A nice boost when you are chaining kills, especially when leveling.' },
+          { tag: 'new', term: 'Heating Up', text: 'Works a little differently from the instant Pyroblasts you might be familiar with. Critical hits from Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce Pyroblast\'s cast time by 25%, stacking up to three times. At full stacks, that is a 75% shorter Pyroblast cast.' },
           { tag: 'improved', term: 'Combustion', text: 'Now lasts until you land four critical strikes instead of three, giving you another crit before the effect ends.' }
         ]
       },
@@ -487,7 +486,7 @@ const CLASSES = [
           { tag: 'new', term: 'Ice Lance and Fingers of Frost', text: 'Another instant damage spell, and procs that let you take advantage of frozen-target interactions. Ice Lance gives you an option to deal damage while moving as well.' },
           { tag: 'moved', term: 'Cold Snap', text: 'Moves down to the 21-point talent tier, so Fire and Arcane builds need a bigger investment if they want to pick it up.' },
           { tag: 'nerf', term: 'Improved Blizzard', text: 'Its slow drops from 65% to 40%. With Permafrost included, that takes the maximum slow from 75% down to 50%. Enemies move through your Blizzard faster, so you will have less room for error when kiting a big pack.' },
-          { term: 'Fire and Frost hybrids', text: 'There is potential in combining Hot Streak\'s faster Pyroblasts with Fingers of Frost and Ice Lance, especially for PvP. We will have to see how those builds come together.' }
+          { term: 'Fire and Frost hybrids', text: 'There is potential in combining Heating Up\'s faster Pyroblasts with Fingers of Frost and Ice Lance, especially for PvP. We will have to see how those builds come together.' }
         ]
       }
     ],
@@ -620,9 +619,8 @@ const CLASSES = [
           'You build rage through your strikes and spend it to maintain the offensive. Keep Bloodthirst and your other attacks working, watch for opportunities to strike several foes, and avoid spending so freely that your next important ability must wait.'
         ],
         changes: [
-          { tag: 'improved', term: 'Dual Wield Specialization', text: 'Now doubles your offhand rage generation and adds 10% hit chance to offhand attacks, while Precision adds another 3% hit chance. More reliable offhand hits feeding you more rage could make a real difference.' },
-          { tag: 'new', term: 'Boundless Rage', text: 'Increases your maximum rage by 30, so you have more room to pool resources before spending them.' },
-          { tag: 'new', term: 'Raging Blows', text: 'Makes Whirlwind strike with your offhand weapon as well and reduces Cleave\'s rage cost, improving how those abilities work against multiple enemies.' },
+          { tag: 'improved', term: 'Dual Wield Specialization', text: 'Now increases your offhand damage by 25% and the rage from offhand attacks by 50%, while Furious Precision adds 10% hit chance to offhand attacks. More reliable offhand hits feeding you more rage could make a real difference.' },
+          { tag: 'new', term: 'Raging Blows', text: 'Reduces the rage cost of Cleave and Whirlwind, improving how those abilities work against multiple enemies.' },
           { tag: 'mixed', term: 'Mobility', text: 'Bloodthirst trades its old healing effect for a 10% movement-speed increase, and Improved Berserker Rage clears movement-impairing effects. Iron Will also moves into Fury, reducing stun and fear durations by 15%.' },
           { tag: 'nerf', term: 'Toned down', text: 'Flurry drops from 30% to 25% attack speed, and Bloodthirst has lower attack-power scaling. Enrage now has a 30% chance to trigger from any damaging attack you take, giving 10% increased physical damage for 12 seconds. Death Wish now increases damage taken by 5%, replacing its old armor and resistance penalty.' }
         ],
