@@ -16,5 +16,17 @@
       "source": "/keybinds/:path*",
       "destination": "/index.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/gold-farming",
+      "destination": "/classes",
+      "permanent": false
+    },
+    {
+      "source": "/gold-farming/:path*",
+      "destination": "/classes",
+      "permanent": false
+    }
   ]
 }
