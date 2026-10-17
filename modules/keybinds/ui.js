@@ -6,6 +6,8 @@ const kbClass = id => CLASSES.find(c => c.id === id);
 const kbSpec = (cls, spec) => (kbClass(cls) || { specs: [] }).specs.find(s => s.id === spec);
 const kbAbility = (cls, key) => SPELLS[cls] && SPELLS[cls].abilities.find(a => a.key === key);
 const kbIcon = id => `data/icons/${id}.png`;
+// the class colour for a page's own <main> (so it never leaks into other sections)
+const kbAccent = cls => { const c = kbClass(cls); return c ? `style="--cls:${c.color};--cls-text:${c.text}"` : ''; };
 const HEALER_SPECS = new Set(['paladin/holy', 'druid/restoration', 'priest/discipline', 'priest/holy', 'shaman/restoration']);
 const TANK_SPECS = new Set(['warrior/protection', 'paladin/protection']);
 
@@ -42,14 +44,16 @@ const kbNewId = () => Date.now().toString(36) + Math.random().toString(36).slice
 function kbLoadLayout(cls, spec, query) {
   const code = query && query.get('l');
   if (code) {
-    const l = decode(code, SPELLS);
+    const l = decode(code, SPELLS, MICE);
     if (l.error) return { error: l.error };
+    if (l.cls !== cls) return { error: 'class' };
+    l.spec = spec;  // the address decides the spec
     return { layout: l, shared: true };
   }
   const all = kbLayouts().filter(x => x.cls === cls && x.spec === spec);
   const cur = kbStore.get(`kb:cur:${cls}/${spec}`, null);
   const row = all.find(x => x.id === cur) || all[all.length - 1];
-  if (row) { const l = decode(row.code, SPELLS); if (!l.error) return { layout: l, id: row.id }; }
+  if (row) { const l = decode(row.code, SPELLS, MICE); if (!l.error && l.cls === cls) { l.spec = spec; return { layout: l, id: row.id }; } }
   return { layout: newLayout(cls, spec), id: kbNewId(), fresh: true };
 }
 

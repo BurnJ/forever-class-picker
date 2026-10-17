@@ -86,7 +86,7 @@ function packItems(arr, idOf) {
 }
 function unpackItems(arr, keyOf) {
   const out = Array(SLOTS).fill(null);
-  (arr || []).slice(0, SLOTS).forEach((x, i) => {
+  (Array.isArray(arr) ? arr : []).slice(0, SLOTS).forEach((x, i) => {
     if (typeof x === 'number' && x) { const k = keyOf(x); out[i] = k ? { a: k } : null; }
     else if (typeof x === 'string' && x) out[i] = { label: x.slice(0, 24) };
   });
@@ -102,27 +102,31 @@ function encode(layout, spells) {
   return b64url(JSON.stringify(o));
 }
 // spellsByClass = SPELLS
-function decode(str, spellsByClass) {
+function decode(str, spellsByClass, mice) {
+  try { return decodeUnsafe(str, spellsByClass, mice); } catch { return { error: 'broken' }; }
+}
+function decodeUnsafe(str, spellsByClass, mice) {
+  const own = (o, k) => !!o && typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
   let o;
   try { o = JSON.parse(unb64url(String(str || ''))); } catch { return { error: 'broken' }; }
   if (!o || typeof o !== 'object') return { error: 'broken' };
   if (o.v !== CODEC_VERSION) return { error: 'version' };
+  if (!own(spellsByClass, o.c)) return { error: 'class' };
   const spells = spellsByClass[o.c];
-  if (!spells) return { error: 'class' };
   const byId = {};
   spells.abilities.forEach(a => a.ranks.forEach(r => { byId[r.spell] = a.key; }));
   const keyOf = id => byId[id] || null;
   const layout = newLayout(o.c, String(o.s || ''));
   layout.name = String(o.n || '').slice(0, 40);
-  layout.mouse = typeof o.m === 'string' ? o.m : 'keyboard';
+  layout.mouse = own(mice || { keyboard: 1, two: 1, g600: 1, naga: 1, scimitar: 1 }, o.m) ? o.m : 'keyboard';
   layout.shown = Math.max(0, Math.min(EXTRA_BARS.length, +o.x || 0));
   for (const page of Object.keys(layout.pages)) layout.pages[page] = unpackItems(o.p && o.p[page], keyOf);
   for (const bar of EXTRA_BARS) layout.bars[bar] = unpackItems(o.b && o.b[bar], keyOf);
   layout.binds = {};
-  for (const [s, b] of Object.entries(o.k || {}))
+  for (const [s, b] of Object.entries(o.k && typeof o.k === 'object' ? o.k : {}))
     if (/^b[1-6]:(\d|1[01])$/.test(s) && typeof b === 'string' && b.length < 32) layout.binds[s] = b;
   layout.mouseKeys = {};
-  for (const [s, b] of Object.entries(o.mk || {})) if (typeof b === 'string' && b.length < 32) layout.mouseKeys[String(s).slice(0, 8)] = b;
+  for (const [s, b] of Object.entries(o.mk && typeof o.mk === 'object' ? o.mk : {})) if (typeof b === 'string' && b.length < 32) layout.mouseKeys[String(s).slice(0, 8)] = b;
   return layout;
 }
 

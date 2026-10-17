@@ -188,12 +188,12 @@ function createSim(opts) {
   };
 
   /* ---------- pressing a button ---------- */
-  // via: 'key' (a bind) or 'click' (clicked the button: counted, since breaking that habit is the point)
+  // via: 'key' (a bind), 'repeat' (a held key: never counted as a mistake) or 'click' (counted, since breaking that habit is the point)
   sim.press = (key, t, via) => {
     sim.advance(t);
     if (s.over) return { ok: false, reason: 'over' };
     if (via === 'click') s.stats.clicks++;
-    if (s.hint) { s.stats.hintPresses++; if (s.hint === key) s.stats.hintFollowed++; }
+    if (s.hint && via !== 'repeat') { s.stats.hintPresses++; if (s.hint === key) s.stats.hintFollowed++; }
     const a = abilities[key];
     if (!a) { s.stats.wrongKeys++; ev('fail', { reason: 'unbound' }); return { ok: false, reason: 'unbound' }; }
     const u = sim.usable(key);
@@ -209,7 +209,7 @@ function createSim(opts) {
       ev('queue', { key });
       return { ok: true, queued: true };
     }
-    s.stats.failed++;
+    if (via !== 'repeat') s.stats.failed++;
     ev('fail', { key, reason: u.reason, text: sim.reasonText(u.reason, u.rank) });
     return { ok: false, reason: u.reason };
   };

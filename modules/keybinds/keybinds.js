@@ -4,9 +4,7 @@
 
 function keybindsHome() {
   tipCtx = null;
-  document.body.style.removeProperty('--cls');
-  document.body.style.removeProperty('--cls-text');
-  const mine = kbLayouts().slice().sort((a, b) => b.updated - a.updated);
+  const mine = kbLayouts().filter(x => kbClass(x.cls) && kbSpec(x.cls, x.spec)).sort((a, b) => b.updated - a.updated);
   app.innerHTML = `<main class="kb kb-home">
     <div class="kb-intro">
       <h1>Keybinds</h1>
@@ -19,7 +17,7 @@ function keybindsHome() {
           return `<li><a href="${KB_ROOT}/${c.id}/${s.id}">${ic ? `<img src="${kbIcon(ic.icon)}" alt="">` : ''}${esc(s.name)}</a></li>`; }).join('')}</ul>
       </section>`).join('')}</div>
     ${mine.length ? `<section class="kb-mine"><h2>Your layouts</h2><ul>${mine.map(x => { const c = kbClass(x.cls), s = kbSpec(x.cls, x.spec);
-      return `<li><a href="${KB_ROOT}/${x.cls}/${x.spec}" data-open="${x.id}"><img src="icons/${x.cls}.png" alt=""><b style="color:${c.text}">${esc(x.name || 'Unnamed layout')}</b>
+      return `<li><a href="${KB_ROOT}/${esc(x.cls)}/${esc(x.spec)}" data-open="${esc(x.id)}"><img src="icons/${esc(x.cls)}.png" alt=""><b style="color:${c.text}">${esc(x.name || 'Unnamed layout')}</b>
         <span>${esc(s ? s.name : x.spec)} ${esc(c.name)}</span></a></li>`; }).join('')}</ul></section>` : ''}
     <p class="note kb-foot">Abilities, ranks, costs and cooldowns come from the WoW Forever beta client (build ${esc(SPELLS.warrior.build)}). Combat rules link to their sources in the practice notes. Layouts are saved in this browser only.</p>
   </main>`;

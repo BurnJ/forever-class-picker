@@ -30,6 +30,7 @@ const withMods = (e, k) => (e.altKey ? 'ALT-' : '') + (e.ctrlKey ? 'CTRL-' : '')
 
 // A keydown, mousedown or wheel event -> bind name, or null when it isn't one (a lone modifier, a left click).
 function bindFromEvent(e) {
+  if (e.metaKey) return null;  // Cmd/Win combinations belong to the system
   if (e.type === 'keydown') {
     const k = keyName(e.code);
     return k ? withMods(e, k) : null;
@@ -57,6 +58,8 @@ function bindLabel(b) {
 }
 
 const isReserved = b => RESERVED.has(b);
+// keys the practice page leaves to the browser when they aren't bound (reload, full screen, dev tools, back)
+const PASSTHROUGH = new Set(['F5', 'F11', 'F12', 'CTRL-R', 'CTRL-SHIFT-R', 'CTRL-L', 'ALT-LEFT', 'ALT-RIGHT', 'CTRL-F5']);
 const isMouse = b => /(^|-)(BUTTON\d|MOUSEWHEEL(UP|DOWN))$/.test(b);
 
-if (typeof module !== 'undefined') module.exports = { bindFromEvent, bindLabel, isReserved, isMouse, RESERVED };
+if (typeof module !== 'undefined') module.exports = { bindFromEvent, bindLabel, isReserved, isMouse, RESERVED, PASSTHROUGH };

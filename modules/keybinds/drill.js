@@ -18,15 +18,15 @@ function drillPage(cls, spec, query) {
     const pages = bar === 'b1' ? Object.keys(l.pages) : [null];
     for (const p of pages) {
       const it = itemAt(l, slot, p);
-      if (it && it.a && !items.some(x => x.key === it.a)) items.push({ key: it.a, bind, slot, page: pages.length > 1 && p ? p : null });
+      if (!it || !it.a) continue;
+      const known = items.find(x => x.key === it.a);
+      if (known) { if (!known.binds.includes(bind)) known.binds.push(bind); }  // any of its binds counts
+      else items.push({ key: it.a, bind, binds: [bind], slot, page: pages.length > 1 && p ? p : null });
     }
   }
   drill = { cls, spec, layout: l, id: got.id, shared: !!got.shared, query: query.toString(), items, stats: {}, round: 0, current: null, shownAt: 0, results: [] };
   tipCtx = kbTipCtx(cls);
-  const c = kbClass(cls);
-  document.body.style.setProperty('--cls', c.color);
-  document.body.style.setProperty('--cls-text', c.text);
-  app.innerHTML = `<main class="kb kb-drill">${drillTop()}
+  app.innerHTML = `<main class="kb kb-drill" ${kbAccent(cls)}>${drillTop()}
     <div class="kb-drillbox panel" id="kb-drillbox">${items.length < 2
       ? `<p class="kb-warn">Bind at least two abilities first. <a href="${KB_ROOT}/${cls}/${spec}">Back to the plan</a></p>`
       : `<h2>Drill your binds</h2><p>An ability appears. Press its bind as fast as you can. ${DRILL_ROUNDS} in a row; the ones you miss come back more often.</p>
@@ -80,9 +80,10 @@ function drillNext() {
   drill.shownAt = performance.now();
 }
 function drillKey(e) {
-  if (!document.querySelector('.kb-drill') || !drill.current) { drillStop(); return; }
+  if (!document.querySelector('.kb-drill')) { drillStop(); return; }
   if (e.type === 'mousedown' && (e.button === 0 || e.button === 2)) return;
   if (e.type === 'keydown' && e.code === 'Escape') { drillDone(); return; }
+  if (!drill.current) return;  // between prompts
   const bind = bindFromEvent(e);
   if (!bind || isReserved(bind) || e.repeat) return;
   e.preventDefault();
@@ -90,7 +91,7 @@ function drillKey(e) {
   const st = drill.stats[drill.current.key] || (drill.stats[drill.current.key] = { tries: 0, misses: 0, avg: 0, n: 0 });
   st.tries++;
   const fb = document.getElementById('kb-dfb');
-  if (bind !== drill.current.bind) {
+  if (!drill.current.binds.includes(bind)) {
     st.misses++;
     drill.wrong = true;
     if (fb) { fb.textContent = `That's ${bindLabel(bind)}. It's ${bindLabel(drill.current.bind)}.`; fb.className = 'kb-dfeedback bad'; }

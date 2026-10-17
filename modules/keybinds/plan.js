@@ -31,10 +31,8 @@ function renderPlan() {
   hideTip();
   const { cls, spec, layout } = plan;
   const c = kbClass(cls);
-  document.body.style.setProperty('--cls', c.color);
-  document.body.style.setProperty('--cls-text', c.text);
   const mine = kbLayouts().filter(x => x.cls === cls && x.spec === spec);
-  app.innerHTML = `<main class="kb kb-plan">
+  app.innerHTML = `<main class="kb kb-plan" ${kbAccent(cls)}>
     <div class="bar kb-top">
       ${kbClassStrip(cls)}
       <h1>${esc(c.name)}</h1>
@@ -118,7 +116,7 @@ function barsHtml() {
 /* ---------- mouse ---------- */
 function mouseHtml() {
   const { layout, cls } = plan;
-  const m = MICE[layout.mouse] || MICE.keyboard;
+  const m = Object.prototype.hasOwnProperty.call(MICE, layout.mouse) ? MICE[layout.mouse] : MICE.keyboard;
   const abilityFor = bind => { const s = bind && slotForBind(layout, bind); const it = s && itemAt(layout, s, plan.page); return it && it.a ? kbAbility(cls, it.a) : null; };
   return `<h2>Your mouse</h2>
     <select id="kb-mouse" aria-label="Mouse">${Object.entries(MICE).map(([id, x]) => `<option value="${id}"${id === layout.mouse ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select>
@@ -160,6 +158,9 @@ function wirePlan() {
     if (t.dataset.tab) { plan.tab = t.dataset.tab; plan.pageNo = 0; rerenderParts(); return; }
     if (t.dataset.pg) { plan.pageNo += +t.dataset.pg; rerenderParts(); return; }
     if (t.dataset.page) { plan.page = t.dataset.page; rerenderParts(); return; }
+    if (plan.shared && (t.dataset.shown || t.dataset.pick || t.dataset.mb || t.dataset.act === 'fill' || t.dataset.act === 'bindmode' || t.dataset.act === 'reset')) {
+      setMsg('This is a shared layout. Copy it to your layouts to change it.'); return;
+    }
     if (t.dataset.shown) { plan.layout.shown = +t.dataset.shown; change(); root.querySelectorAll('[data-shown]').forEach(b => b.setAttribute('aria-pressed', b === t)); return; }
     if (t.dataset.pick) { plan.picked = { a: t.dataset.pick }; rerenderParts(); return; }
     if (t.dataset.mb) {
@@ -196,13 +197,20 @@ function wirePlan() {
     change();
   });
   root.addEventListener('change', e => {
+    if (e.target.id === 'kb-mouse' && plan.shared) { e.target.value = plan.layout.mouse; setMsg('This is a shared layout. Copy it to your layouts to change it.'); return; }
     if (e.target.id === 'kb-mouse') { plan.layout.mouse = e.target.value; plan.mouseCapture = null; change(); }
     if (e.target.id === 'kb-pick') { kbStore.set(`kb:cur:${plan.cls}/${plan.spec}`, e.target.value); planPage(plan.cls, plan.spec, new URLSearchParams()); }
   });
   root.addEventListener('input', e => {
     if (e.target.id === 'kb-name') { plan.layout.name = e.target.value; planSave(); }
-    if (e.target.id === 'kb-level') { plan.level = +e.target.value; kbStore.set('kb:planLevel', plan.level); e.target.nextElementSibling.textContent = plan.level;
-      const ul = document.querySelector('.kb-spells'); if (ul) { const pos = e.target.value; document.querySelector('.kb-book').innerHTML = bookHtml(); wireBook(); const r = document.getElementById('kb-level'); r.value = pos; r.focus(); } }
+    if (e.target.id === 'kb-level') {
+      plan.level = +e.target.value; kbStore.set('kb:planLevel', plan.level); e.target.nextElementSibling.textContent = plan.level;
+      // swap only the list, so the slider being dragged stays put
+      const tmp = document.createElement('div');
+      tmp.innerHTML = bookHtml();
+      document.querySelector('.kb-spells').replaceWith(tmp.querySelector('.kb-spells'));
+      wireBook();
+    }
   });
   root.addEventListener('submit', e => {
     if (e.target.id !== 'kb-labelform') return;

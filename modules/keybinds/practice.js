@@ -15,9 +15,6 @@ function practicePage(cls, spec, query) {
     opts: Object.assign({ level: 60, length: 120, hint: true, hitBack: TANK_SPECS.has(key) || cls === 'warrior' && spec === 'protection',
       healer: HEALER_SPECS.has(key), distance: cls === 'hunter' ? 'ranged' : 'melee', stealth: true }, saved[key] || {}) };
   tipCtx = kbTipCtx(cls);
-  const c = kbClass(cls);
-  document.body.style.setProperty('--cls', c.color);
-  document.body.style.setProperty('--cls-text', c.text);
   setupScreen();
 }
 
@@ -51,7 +48,7 @@ function setupScreen() {
   const empty = placedCount(layout) === 0;
   const best = kbStore.get(`kb:hist:${prac.id || 'shared'}`, []).filter(h => h.level === opts.level && h.healer === opts.healer);
   const rot = listFor(typeof ROTATIONS !== 'undefined' ? ROTATIONS : null, cls, spec, opts.level);
-  app.innerHTML = `<main class="kb kb-prac">${pracTop('/practice')}
+  app.innerHTML = `<main class="kb kb-prac" ${kbAccent(prac.cls)}>${pracTop('/practice')}
     <div class="kb-setup panel">
       <h2>${esc(kbSpec(cls, spec).name)} on the training dummy</h2>
       ${empty ? `<p class="kb-warn">Your bars are empty. <a href="${KB_ROOT}/${cls}/${spec}">Plan your layout first</a>, then come back to practice it.</p>` : `
@@ -123,7 +120,7 @@ const simNow = () => performance.now() / 1000 - prac.offset;
 function renderRun() {
   const { cls, sim } = prac;
   const s = sim.state;
-  app.innerHTML = `<main class="kb kb-prac kb-running">${pracTop('/practice')}
+  app.innerHTML = `<main class="kb kb-prac kb-running" ${kbAccent(cls)}>${pracTop('/practice')}
     <div class="kb-scene" id="kb-scene"><img class="kb-still" src="${stillSrcFor(cls)}" alt="">
       <div class="kb-unit kb-player"><span class="kb-uname">You</span>
         <div class="kb-sbar hp"><i id="kb-php"></i><b id="kb-phpt"></b></div>
@@ -181,10 +178,9 @@ function pressSlot(slot, via, repeat) {
   begin();
   if (!it) { if (!repeat) prac.sim.wrongKey(); return; }
   if (!it.a) { flashError(`${it.label} isn't part of the practice`); return; }
-  const r = prac.sim.press(it.a, simNow(), via);
+  prac.sim.press(it.a, simNow(), repeat ? 'repeat' : via);
   const btn = prac.buttons.find(b => b.el.dataset.slot === slot);
   if (btn) { btn.el.classList.add('down'); setTimeout(() => btn.el.classList.remove('down'), 120); }
-  if (repeat && !r.ok) prac.sim.state.stats.failed = Math.max(0, prac.sim.state.stats.failed - 1);  // holding a key isn't a mistake
 }
 function begin() {
   if (prac.started) return;
@@ -198,12 +194,16 @@ function begin() {
 
 function handleBind(e, bind) {
   if (!bind || isReserved(bind)) return;
-  e.preventDefault();
   const slot = slotForBind(prac.layout, bind);
   if (!slot || !itemAt(prac.layout, slot, prac.page)) {
+    // an unbound key is a wrong key (that's the habit being trained); unbound mouse buttons, the wheel
+    // and browser keys are left alone
+    if (e.type !== 'keydown' || PASSTHROUGH.has(bind)) return;
+    e.preventDefault();
     if (!e.repeat) { begin(); prac.sim.wrongKey(); }
     return;
   }
+  e.preventDefault();
   pressSlot(slot, 'key', e.repeat);
 }
 function pracKey(e) {
@@ -362,7 +362,7 @@ function finishRun() {
   kbStore.set(histKey, hist.slice(-30));
   const top = Object.entries(st.byAbility).sort((a, b) => b[1].damage - a[1].damage).slice(0, 6);
   const score = healer ? row.hps : row.dps;
-  app.innerHTML = `<main class="kb kb-prac">${pracTop('/practice')}
+  app.innerHTML = `<main class="kb kb-prac" ${kbAccent(prac.cls)}>${pracTop('/practice')}
     <div class="kb-score panel">
       <h2>${score} ${healer ? 'healing' : 'damage'} per second</h2>
       <p class="note">${kbClock(row.seconds)} at level ${opts.level}${best ? (score > best ? ' &middot; <b class="kb-best">A new best for this layout</b>' : ` &middot; your best is ${best}`) : ''}</p>
