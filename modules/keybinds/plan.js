@@ -1,17 +1,21 @@
 'use strict';
-/* Keybinds plan page: /keybinds/<class>/<spec>. Spellbook on the left, action bars in the middle, the mouse on the right.
+/* Keybinds plan page: /keybinds/<class>/<spec>. The game's spellbook on the left (one page, or both pages when
+   expanded), action bars on the right with the mouse and the bind list under them.
    Drag (or click, then click a slot) to place; Keybind mode: hover a button and press a key or mouse button. */
 
-const PLAN_ROWS = 7, PLAN_COLS = 2, PLAN_PER_PAGE = PLAN_ROWS * PLAN_COLS;
-let plan = null;  // { cls, spec, layout, id, shared, tab, pageNo, level, page (bar 1 page), picked, bindMode, mouseCapture }
+const BOOK_COLS = 3;  // abilities per row on a page, as in game (more when the page is wide, fewer when it's narrow)
+// both pages open only where they fit beside the bars
+const bookOpen = () => plan.expanded && innerWidth >= 1600;
+let plan = null;  // { cls, spec, layout, id, shared, tab, pageNo, perPage, search, expanded, level, page (bar 1 page), picked, bindMode, mouseCapture }
 
 function planPage(cls, spec, query) {
   const got = kbLoadLayout(cls, spec, query);
   if (got.error) { brokenLink(cls, spec, got.error); return; }
   const prevTab = plan && plan.cls === cls ? plan.tab : null;
   plan = { cls, spec, layout: got.layout, id: got.id || null, shared: !!got.shared, tab: prevTab || spec,
-    pageNo: 0, level: kbStore.get('kb:planLevel', 60), page: pagesFor(cls)[0], picked: null, bindMode: false, mouseCapture: null, msg: '' };
-  if (!SPELLS[cls].lines[plan.tab]) plan.tab = spec in SPELLS[cls].lines ? spec : Object.keys(SPELLS[cls].lines)[0];
+    pageNo: 0, perPage: BOOK_COLS * 6, search: '', expanded: kbStore.get('kb:bookExpanded', false),
+    level: kbStore.get('kb:planLevel', 60), page: pagesFor(cls)[0], picked: null, bindMode: false, mouseCapture: null, msg: '' };
+  if (plan.tab !== 'general' && !SPELLS[cls].lines[plan.tab]) plan.tab = spec in SPELLS[cls].lines ? spec : Object.keys(SPELLS[cls].lines)[0];
   tipCtx = kbTipCtx(cls);
   renderPlan();
 }
@@ -41,7 +45,8 @@ function renderPlan() {
       <a class="btn" href="${KB_ROOT}/${cls}/${spec}/practice${plan.shared ? location.search : ''}">Practice on the dummy</a>
     </div>
     <div class="kb-cols">
-      <section class="kb-book" aria-label="Spellbook">${bookHtml()}</section>
+      <section class="kb-book${bookOpen() ? ' expanded' : ''}" aria-label="Spellbook">${bookHtml()}</section>
+      <div class="kb-right">
       <section class="kb-center" aria-label="Action bars">
         ${plan.shared ? `<div class="kb-shared">You're looking at a shared layout${layout.name ? `: <b>${esc(layout.name)}</b>` : ''}.
           <button type="button" class="btn" data-act="copy">Copy to my layouts</button></div>` : `
@@ -67,36 +72,86 @@ function renderPlan() {
         </div>
       </section>
       <section class="kb-mouse" aria-label="Your mouse">${mouseHtml()}</section>
+      </div>
     </div></main>`;
   plan.msg = '';
   wirePlan();
+  fitBook();
 }
+addEventListener('resize', () => {
+  if (!plan || !document.querySelector('.kb-plan')) return;
+  const book = document.querySelector('.kb-book');
+  if (book.classList.contains('expanded') !== bookOpen()) { book.classList.toggle('expanded', bookOpen()); book.innerHTML = bookHtml(); wireBook(); }
+  fitBook();
+});
 
-/* ---------- spellbook ---------- */
+/* ---------- spellbook (the game's: tabs, one parchment page or two, three columns, page arrows) ---------- */
+function bookList() {
+  const { cls, tab } = plan;
+  const all = SPELLS[cls].abilities;
+  const q = plan.search.trim().toLowerCase();
+  if (q) return all.filter(a => a.name.toLowerCase().includes(q));
+  return all.filter(a => (a.line || 'general') === tab);
+}
+function bookEntry(a, placed) {
+  const r = rankAt(a, plan.level), lv = a.ranks[0].level;
+  const sub = !r ? `Level ${lv}${a.talent ? ' talent' : ''}` : a.talent ? 'Talent' : a.races ? a.races.join(', ') : a.ranks.length > 1 ? `Rank ${a.ranks.indexOf(r) + 1}` : '';
+  return `<li class="kb-spell${r ? '' : ' later'}${placed.has(a.key) ? ' placed' : ''}" data-pick="${esc(a.key)}" data-ab="${esc(a.name)}" tabindex="0">
+    <span class="kb-sframe"><img src="${kbIcon(a.icon)}" alt="" draggable="false"></span>
+    <span class="kb-stext"><b>${esc(a.name)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</span></li>`;
+}
 function bookHtml() {
   const { cls, tab, level } = plan;
   const lines = SPELLS[cls].lines;
+  const T = window.TALENTS && TALENTS[cls];
   const order = kbClass(cls).specs.map(s => s.id).filter(id => lines[id]);
-  const list = SPELLS[cls].abilities.filter(a => (a.line || 'general') === tab || (tab === order[0] && !a.line));
-  const pages = Math.max(1, Math.ceil(list.length / PLAN_PER_PAGE));
+  const tabs = [{ id: 'general', name: 'General', icon: 135274 },
+    ...order.map(id => ({ id, name: lines[id], icon: (T && findTree(T, id) || {}).icon }))];
+  const list = bookList();
+  const per = plan.perPage * (bookOpen() ? 2 : 1);
+  const pages = Math.max(1, Math.ceil(list.length / per));
   plan.pageNo = Math.min(plan.pageNo, pages - 1);
-  const shown = list.slice(plan.pageNo * PLAN_PER_PAGE, (plan.pageNo + 1) * PLAN_PER_PAGE);
+  const shown = list.slice(plan.pageNo * per, (plan.pageNo + 1) * per);
   const placed = new Set();
   for (const arr of [...Object.values(plan.layout.pages), ...Object.values(plan.layout.bars)]) arr.forEach(it => it && it.a && placed.add(it.a));
-  return `<label class="kb-level kb-booklevel">Planning for level <input type="range" id="kb-level" min="1" max="60" value="${level}"><b>${level}</b></label>
-    <div class="kb-tabs" role="tablist">${order.map(id => `<button type="button" role="tab" data-tab="${id}" aria-selected="${id === tab}">${esc(lines[id])}</button>`).join('')}</div>
-    <div class="kb-page">
-      <ul class="kb-spells">${shown.map(a => {
-        const r = rankAt(a, level), lv = a.ranks[0].level;
-        return `<li class="kb-spell${r ? '' : ' later'}${placed.has(a.key) ? ' placed' : ''}" data-pick="${esc(a.key)}" data-ab="${esc(a.name)}" tabindex="0">
-          <img src="${kbIcon(a.icon)}" alt="" draggable="false"><span><b>${esc(a.name)}</b><small>${r ? (a.talent ? 'Talent' : a.ranks.length > 1 ? `Rank ${a.ranks.indexOf(r) + 1}` : '') : `Level ${lv}${a.talent ? ' talent' : ''}`}</small></span></li>`;
-      }).join('')}</ul>
-      <div class="kb-pager"><button type="button" data-pg="-1" ${plan.pageNo ? '' : 'disabled'} aria-label="Previous page">&#9664;</button>
-        <span>Page ${plan.pageNo + 1} of ${pages}</span>
-        <button type="button" data-pg="1" ${plan.pageNo < pages - 1 ? '' : 'disabled'} aria-label="Next page">&#9654;</button></div>
+  const title = plan.search.trim() ? 'Search' : (tabs.find(t => t.id === tab) || tabs[0]).name;
+  const leaf = items => `<ul class="kb-spells">${items.map(a => bookEntry(a, placed)).join('')}</ul>`;
+  return `<div class="kb-sb-top">
+      <span class="kb-sb-portrait"><img src="icons/${cls}.png" alt=""></span>
+      <span class="kb-sb-title">Spellbook</span>
+      <button type="button" class="kb-sb-expand" data-act="expand" aria-pressed="${plan.expanded}" title="${plan.expanded ? 'One page' : 'Both pages'}">${plan.expanded ? '&#8601;' : '&#8599;'}</button>
+      <div class="kb-sb-tabs" role="tablist">${tabs.map(t => `<button type="button" role="tab" data-tab="${t.id}" aria-selected="${!plan.search && t.id === tab}" title="${esc(t.name)}">
+        ${t.icon ? `<img src="${kbIcon(t.icon)}" alt="${esc(t.name)}">` : esc(t.name.slice(0, 2))}</button>`).join('')}</div>
+      <label class="kb-level kb-booklevel">Level <input type="range" id="kb-level" min="1" max="60" value="${level}"><b>${level}</b></label>
+      <input class="kb-sb-search" id="kb-search" type="search" placeholder="Search abilities" value="${esc(plan.search)}" aria-label="Search abilities">
+    </div>
+    <div class="kb-sb-pages">
+      <div class="kb-page"><h2 class="kb-sb-h">${esc(title)}</h2>${leaf(shown.slice(0, plan.perPage))}
+        ${list.length ? '' : '<p class="kb-sb-none">Nothing matches.</p>'}</div>
+      ${bookOpen() ? `<div class="kb-page right"><div class="kb-sb-h"></div>${leaf(shown.slice(plan.perPage))}</div>` : ''}
+    </div>
+    <div class="kb-sb-foot">
       <form class="kb-labelform" id="kb-labelform"><input id="kb-labelinput" maxlength="24" placeholder="Potion, mount, macro..." aria-label="Label for a button that isn't an ability">
         <button type="submit" class="kb-link">Add label</button></form>
+      <div class="kb-pager"><span>Page ${plan.pageNo + 1}/${pages}</span>
+        <button type="button" data-pg="-1" ${plan.pageNo ? '' : 'disabled'} aria-label="Previous page">&#9664;</button>
+        <button type="button" data-pg="1" ${plan.pageNo < pages - 1 ? '' : 'disabled'} aria-label="Next page">&#9654;</button></div>
     </div>`;
+}
+// How many abilities fit on one page at this window size: whole rows of three.
+function fitBook() {
+  const ul = document.querySelector('.kb-book .kb-page .kb-spells');
+  if (!ul) return;
+  const li = ul.querySelector('.kb-spell');
+  const gap = parseFloat(getComputedStyle(ul).rowGap) || 0;
+  const rowH = li ? li.getBoundingClientRect().height + gap : 64;
+  const rows = Math.max(3, Math.floor((ul.clientHeight + gap) / rowH));
+  const cols = getComputedStyle(ul).gridTemplateColumns.split(' ').filter(Boolean).length || BOOK_COLS;  // as many as the page fits
+  if (rows * cols !== plan.perPage) {
+    plan.perPage = rows * cols;
+    document.querySelector('.kb-book').innerHTML = bookHtml();
+    wireBook();
+  }
 }
 
 /* ---------- bars ---------- */
@@ -118,7 +173,7 @@ function mouseHtml() {
   const { layout, cls } = plan;
   const m = Object.prototype.hasOwnProperty.call(MICE, layout.mouse) ? MICE[layout.mouse] : MICE.keyboard;
   const abilityFor = bind => { const s = bind && slotForBind(layout, bind); const it = s && itemAt(layout, s, plan.page); return it && it.a ? kbAbility(cls, it.a) : null; };
-  return `<h2>Your mouse</h2>
+  return `<div class="kb-mouse-a"><h2>Your mouse</h2>
     <select id="kb-mouse" aria-label="Mouse">${Object.entries(MICE).map(([id, x]) => `<option value="${id}"${id === layout.mouse ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select>
     ${m.buttons.length ? `<div class="kb-mousebody"><div class="kb-mgrid" style="--cols:${m.cols}">${m.buttons.map(b => {
       const sends = mouseSends(layout, b), a = abilityFor(sends);
@@ -128,17 +183,18 @@ function mouseHtml() {
     }).join('')}</div></div>
     <p class="note">${m.buttons.some(b => !b.fixed) ? (plan.mouseCapture ? 'Press the key that button sends (set in your mouse software).' : 'Click a button, then press the key it sends. Most MMO mice send 1 to = out of the box.') : 'These buttons work as Mouse 4 and Mouse 5 binds.'}</p>
     ${m.buttons.some(b => !b.fixed) ? `<button type="button" class="kb-link" data-act="fill">Set to 1 through =</button>` : ''}`
-    : '<p class="note">Pick your mouse to see its side buttons here. Mouse 4 and 5 can still be bound with Keybind mode.</p>'}
-    <h3>Binds in this layout</h3>
+    : '<p class="note">Pick your mouse to see its side buttons here. Mouse 4 and 5 can still be bound with Keybind mode.</p>'}</div>
+    <div class="kb-mouse-b"><h3>Binds in this layout</h3>
     <ul class="kb-bindlist">${Object.entries(layout.binds).filter(([s]) => itemAt(layout, s, plan.page)).sort((a, b) => a[1].localeCompare(b[1]))
       .map(([s, b]) => { const it = itemAt(layout, s, plan.page); const a = it.a && kbAbility(cls, it.a);
-        return `<li><span class="k">${esc(bindLabel(b))}</span>${a ? `<img src="${kbIcon(a.icon)}" alt="">${esc(a.name)}` : esc(it.label)}</li>`; }).join('') || '<li class="note">Nothing bound yet.</li>'}</ul>`;
+        return `<li><span class="k">${esc(bindLabel(b))}</span>${a ? `<img src="${kbIcon(a.icon)}" alt="">${esc(a.name)}` : esc(it.label)}</li>`; }).join('') || '<li class="note">Nothing bound yet.</li>'}</ul></div>`;
 }
 
 /* ---------- events ---------- */
 function setMsg(t) { const el = document.getElementById('kb-msg'); if (el) el.textContent = t; }
 function rerenderParts() {
   hideTip();  // the hovered element is about to be replaced
+  requestAnimationFrame(() => { if (document.querySelector('.kb-plan')) fitBook(); });
   document.querySelector('.kb-book').innerHTML = bookHtml();
   document.getElementById('kb-bars').innerHTML = barsHtml();
   document.querySelector('.kb-mouse').innerHTML = mouseHtml();
@@ -155,7 +211,11 @@ function wirePlan() {
     if (plan.dragged) { plan.dragged = false; return; }
     const t = e.target.closest('button, [data-pick]');
     if (!t) return;
-    if (t.dataset.tab) { plan.tab = t.dataset.tab; plan.pageNo = 0; rerenderParts(); return; }
+    if (t.dataset.tab) { plan.tab = t.dataset.tab; plan.pageNo = 0; plan.search = ''; rerenderParts(); return; }
+    if (t.dataset.act === 'expand') {
+      plan.expanded = !plan.expanded; plan.pageNo = 0; kbStore.set('kb:bookExpanded', plan.expanded);
+      document.querySelector('.kb-book').classList.toggle('expanded', bookOpen()); rerenderParts(); return;
+    }
     if (t.dataset.pg) { plan.pageNo += +t.dataset.pg; rerenderParts(); return; }
     if (t.dataset.page) { plan.page = t.dataset.page; rerenderParts(); return; }
     if (plan.shared && (t.dataset.shown || t.dataset.pick || t.dataset.mb || t.dataset.act === 'fill' || t.dataset.act === 'bindmode' || t.dataset.act === 'reset')) {
@@ -203,12 +263,19 @@ function wirePlan() {
   });
   root.addEventListener('input', e => {
     if (e.target.id === 'kb-name') { plan.layout.name = e.target.value; planSave(); }
+    if (e.target.id === 'kb-search') {
+      plan.search = e.target.value; plan.pageNo = 0;
+      const pos = e.target.selectionStart;
+      document.querySelector('.kb-book').innerHTML = bookHtml(); wireBook();
+      const box = document.getElementById('kb-search'); box.focus(); box.setSelectionRange(pos, pos);
+    }
     if (e.target.id === 'kb-level') {
       plan.level = +e.target.value; kbStore.set('kb:planLevel', plan.level); e.target.nextElementSibling.textContent = plan.level;
       // swap only the list, so the slider being dragged stays put
       const tmp = document.createElement('div');
       tmp.innerHTML = bookHtml();
-      document.querySelector('.kb-spells').replaceWith(tmp.querySelector('.kb-spells'));
+      const fresh = tmp.querySelectorAll('.kb-spells');
+      document.querySelectorAll('.kb-book .kb-spells').forEach((ul, i) => fresh[i] && ul.replaceWith(fresh[i]));
       wireBook();
     }
   });
