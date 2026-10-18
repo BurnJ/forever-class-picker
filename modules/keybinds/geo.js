@@ -164,7 +164,7 @@ const XP_SIZE = { w: 1192, h: 17 };
 //   - bar 1's BOTTOMRIGHT on the micro menu's BOTTOMLEFT, -4.5, -4;
 //   - the bottom stack on bar 1's BOTTOMLEFT, 4 apart: the XP bar, bar 3 (x 606, adds no height), bar 2 (x 22), stance
 //     bar (x 30), pet bar (x 30). Bars that are off or moved drop out and the stack closes up;
-//   - the bottom container (swing timers, 10 apart, centred) from bar 2's top + 35 when bar 2 is on, home and visible,
+//   - the bottom container (swing timers, 10 apart, centred) from the top of bar 2 or 3 + 35 when one is on, home and visible,
 //     else from the micro menu's top + 35 (81);
 //   - bars 4 then 5 from RIGHT -5, -77, each next one its width + 5 further left;
 //   - the right container (objective tracker) 5 left of the outermost visible right bar, from 260 below the top, the
@@ -199,14 +199,16 @@ function gameRects(layout, scr, n = {}) {
     out[id] = { l: b1.l + dx, b: b1.b + y, w: sz.w, h: sz.h };
     if (adds) y += sz.h + 4;
   };
+  const rowY = y;  // bars 2 and 3 share this row
   stack('b3', 606, false);
-  const b2y = y;
   stack('b2', 22, geo.b2.on);
   if (n.stance) stack('stance', 30, true);
   if (n.pet) stack('pet', 30, true);
   // the bottom container
-  const b2counts = geo.b2.on && home('b2') && shownAt(geo.b2);
-  const y0 = b2counts ? b2y + out.b2.h + 35 : moved.menu ? 35 : Math.abs(FRAMES.menu.y) + menu.h + 35;
+  // The code only reads bar 2 here (camelot/editmodeutil.lua:26-29), but Ian has seen bar 3 lift the timers too
+  // (2026-10-18), so the taller of the two that's on, home and visible sets the height.
+  const lifting = ['b2', 'b3'].filter(id => geo[id].on && home(id) && shownAt(geo[id])).map(id => out[id].h);
+  const y0 = lifting.length ? rowY + Math.max(...lifting) + 35 : moved.menu ? 35 : Math.abs(FRAMES.menu.y) + menu.h + 35;
   const timers = ['swingRanged', 'swingOff', 'swingMain'];
   let ty = y0;
   for (const key of timers) {
