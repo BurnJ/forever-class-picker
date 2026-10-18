@@ -11,21 +11,23 @@ function drillPage(cls, spec, query) {
   stopPractice();
   drillStop();
   const l = got.layout;
-  // every bound button holding an ability, on any bar 1 page or extra bar
+  // every bound button holding an ability or an item, on any bar 1 page or extra bar (items are keyed "i:<id>")
   const items = [];
   for (const [slot, bind] of Object.entries(l.binds)) {
     const { bar } = { bar: slot.split(':')[0] };
     const pages = bar === 'b1' ? Object.keys(l.pages) : [null];
     for (const p of pages) {
       const it = itemAt(l, slot, p);
-      if (!it || !it.a) continue;
-      const known = items.find(x => x.key === it.a);
+      if (!it || !(it.a || it.i)) continue;
+      const key = it.a || 'i:' + it.i;
+      const known = items.find(x => x.key === key);
       if (known) { if (!known.binds.includes(bind)) known.binds.push(bind); }  // any of its binds counts
-      else items.push({ key: it.a, bind, binds: [bind], slot, page: pages.length > 1 && p ? p : null });
+      else items.push({ key, bind, binds: [bind], slot, page: pages.length > 1 && p ? p : null });
     }
   }
   drill = { cls, spec, layout: l, id: got.id, shared: !!got.shared, query: query.toString(), items, stats: {}, round: 0, current: null, shownAt: 0, results: [] };
   tipCtx = kbTipCtx(cls);
+  if (layoutHasItems(l)) kbLoadItems().catch(() => {});  // their names and icons, by the time the drill starts
   app.innerHTML = `<main class="kb kb-drill" ${kbAccent(cls)}>${drillTop()}
     <div class="kb-drillbox panel" id="kb-drillbox">${items.length < 2
       ? `<p class="kb-warn">Bind at least two abilities first. <a href="${KB_ROOT}/${cls}/${spec}">Back to the plan</a></p>`
@@ -72,7 +74,7 @@ function drillNext() {
   drill.round++;
   drill.current = drillPick();
   drill.wrong = false;
-  const a = kbAbility(drill.cls, drill.current.key);
+  const a = drillThing(drill.current.key);
   document.getElementById('kb-drillbox').innerHTML = `<div class="kb-prompt">
     <span class="kb-round">${drill.round} / ${DRILL_ROUNDS}</span>
     <span class="frame gold" style="--size:120px"><img src="${kbIcon(a.icon)}" alt=""></span>
@@ -103,12 +105,13 @@ function drillKey(e) {
   drill.current = null;
   setTimeout(drillNext, 350);
 }
+const drillThing = key => key.startsWith('i:') ? kbItem(+key.slice(2)) : kbAbility(drill.cls, key);
 function drillDone() {
   drillStop();
   const r = drill.results;
   const clean = r.filter(x => x.clean).length;
   const avg = r.length ? Math.round(r.reduce((s, x) => s + x.ms, 0) / r.length) : 0;
-  const rows = Object.entries(drill.stats).map(([k, s]) => ({ k, s, a: kbAbility(drill.cls, k), it: drill.items.find(i => i.key === k) }))
+  const rows = Object.entries(drill.stats).map(([k, s]) => ({ k, s, a: drillThing(k), it: drill.items.find(i => i.key === k) }))
     .sort((x, y) => (y.s.misses - x.s.misses) || (y.s.avg - x.s.avg));
   document.getElementById('kb-drillbox').innerHTML = `<h2>${clean} of ${r.length} first try &middot; ${avg} ms average</h2>
     <h3>Slowest and most missed</h3>

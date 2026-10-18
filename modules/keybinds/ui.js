@@ -6,6 +6,34 @@ const kbClass = id => CLASSES.find(c => c.id === id);
 const kbSpec = (cls, spec) => (kbClass(cls) || { specs: [] }).specs.find(s => s.id === spec);
 const kbAbility = (cls, key) => SPELLS[cls] && SPELLS[cls].abilities.find(a => a.key === key);
 const kbIcon = id => `data/icons/${id}.png`;
+/* ---------- items (data/items.js, loaded the first time a page needs it) ---------- */
+const UNKNOWN_ICON = 134400;  // the game's question mark
+let kbItemsLoading = null;
+function kbLoadItems() {
+  if (window.ITEMS) return Promise.resolve(window.ITEMS);
+  if (!kbItemsLoading) kbItemsLoading = new Promise((ok, fail) => {
+    const s = document.createElement('script');
+    s.src = 'data/items.js';
+    s.onload = () => { kbItemById = null; ok(window.ITEMS); };
+    s.onerror = () => { kbItemsLoading = null; fail(new Error('items')); };
+    document.head.appendChild(s);
+  });
+  return kbItemsLoading;
+}
+let kbItemById = null;
+// an item by id; until the list has loaded (or for an id it doesn't have) a question mark with the id
+function kbItem(id) {
+  if (window.ITEMS && !kbItemById) kbItemById = new Map(ITEMS.items.map(i => [i.id, i]));
+  return (kbItemById && kbItemById.get(id)) || { id, name: `Item ${id}`, icon: UNKNOWN_ICON, cat: '', lvl: 0, q: 1, unknown: true };
+}
+const layoutHasItems = l => [...Object.values(l.pages), ...Object.values(l.bars)].some(arr => arr.some(it => it && it.i));
+// what a slot holds, for labels and lists: { name, icon } or null
+function kbSlotThing(cls, it) {
+  if (!it) return null;
+  if (it.a) { const a = kbAbility(cls, it.a); return a && { name: a.name, icon: a.icon }; }
+  if (it.i) { const x = kbItem(it.i); return { name: x.name, icon: x.icon, item: x }; }
+  return { name: it.label, icon: null };
+}
 // the class colour for a page's own <main> (so it never leaks into other sections)
 const kbAccent = cls => { const c = kbClass(cls); return c ? `style="--cls:${c.color};--cls-text:${c.text}"` : ''; };
 const HEALER_SPECS = new Set(['paladin/holy', 'druid/restoration', 'priest/discipline', 'priest/holy', 'shaman/restoration']);
@@ -70,17 +98,23 @@ function kbTipCtx(cls) {
       cast: r.cast ? `${r.cast} sec cast` : 'Instant', cooldown: tal && tal.cooldown || (r.cd ? `${r.cd} sec cooldown` : ''),
       cost: r.cost ? `${r.cost} ${r.power ? r.power[0].toUpperCase() + r.power.slice(1) : ''}` : '' };
   }
+  kbTipItems(abilities);
   return { abilities, talents: {}, pts: {} };
+}
+// items share the ability tooltip (it shows by name): the category and the level it needs
+function kbTipItems(abilities) {
+  if (!window.ITEMS) return;
+  for (const x of ITEMS.items) if (!abilities[x.name]) abilities[x.name] = { icon: x.icon, cast: x.cat, cost: x.lvl ? `Requires level ${x.lvl}` : '', desc: '' };
 }
 
 /* ---------- one action button ---------- */
-// item: null | { a } | { label }; bind: WoW bind name
+// item: null | { a } | { i } | { label }; bind: WoW bind name
 function kbButton(cls, slot, item, bind, extra = '') {
-  const a = item && item.a ? kbAbility(cls, item.a) : null;
-  const inner = a ? `<img class="kb-icon" src="${kbIcon(a.icon)}" alt="" draggable="false">`
-    : item && item.label ? `<span class="kb-label">${esc(item.label)}</span>` : '';
-  return `<button type="button" class="kb-btn${item ? '' : ' empty'}" data-slot="${slot}"${a ? ` data-ab="${esc(a.name)}"` : ''}
-    aria-label="${esc(a ? a.name : item && item.label || 'Empty slot')}${bind ? ', ' + esc(bind) : ''}" ${extra}>${inner}
+  const t = kbSlotThing(cls, item);
+  const inner = t && t.icon ? `<img class="kb-icon" src="${kbIcon(t.icon)}" alt="" draggable="false">`
+    : t ? `<span class="kb-label">${esc(t.name)}</span>` : '';
+  return `<button type="button" class="kb-btn${item ? '' : ' empty'}${t && t.item ? ' item' : ''}" data-slot="${slot}"${t && t.icon ? ` data-ab="${esc(t.name)}"` : ''}
+    aria-label="${esc(t ? t.name : 'Empty slot')}${bind ? ', ' + esc(bind) : ''}" ${extra}>${inner}
     <span class="kb-cd"></span><span class="kb-hk">${esc(bindLabel(bind))}</span></button>`;
 }
 

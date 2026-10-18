@@ -144,13 +144,57 @@
 .kb-bars { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: rgba(0, 0, 0, .35); border: 1px solid var(--line); align-self: flex-start; max-width: 100%; overflow-x: auto; }
 .kb-bar { display: flex; flex-direction: column; gap: 3px; }
 .kb-barname { font-size: 12.5px; color: var(--label); letter-spacing: .06em; text-transform: uppercase; }
-.kb-pages { align-self: flex-start; }
+.kb-pages { align-self: flex-start; align-items: center; }
+.kb-pages > span { padding: 0 10px; color: var(--label); font-size: 13px; }
 .kb-pages button { padding: 4px 12px; font-size: 13px; }
-.kb-barcount { display: flex; align-items: center; gap: 4px; color: var(--label); font-size: 14px; }
-.kb-barcount button { width: 28px; height: 26px; background: var(--panel); border: 1px solid var(--line); color: var(--label); cursor: pointer; }
-.kb-barcount [aria-pressed="true"] { background: var(--gold-mid); color: #1a1408; }
 .kb-msg { color: #7ee07e; font-size: 15px; word-break: break-all; }
 .kb-shared { background: rgba(201, 168, 76, .1); border: 1px solid var(--gold-deep); padding: 8px 12px; }
+
+/* ---------- the game screen (screen.js): bars at their Edit Mode spots, drawn in UIParent units x --s ---------- */
+.kb-screenwrap { position: relative; display: flex; flex-direction: column; gap: 8px; }
+.kb-screen { position: relative; width: 100%; --s: .6; overflow: hidden; border: 1px solid var(--line);
+  background: radial-gradient(ellipse at 50% 38%, #2b3a2e 0%, #18201a 45%, #0b0d0b 100%); }
+.kb-screen.crop { background: rgba(0, 0, 0, .55); border-color: transparent; margin: 0 auto; }
+.kb-screen.editing { background-image: linear-gradient(rgba(120, 170, 255, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(120, 170, 255, .07) 1px, transparent 1px),
+  radial-gradient(ellipse at 50% 38%, #2b3a2e 0%, #18201a 45%, #0b0d0b 100%);
+  background-size: calc(var(--s) * 32px) calc(var(--s) * 32px), calc(var(--s) * 32px) calc(var(--s) * 32px), auto; background-position: center; }
+.kb-xbar { position: absolute; }
+.kb-xbar .kb-btn { position: absolute; width: calc(var(--s) * var(--b) * 1px); height: calc(var(--s) * var(--b) * 1px); }
+.kb-xbar .kb-hk { font-size: max(8px, calc(var(--s) * var(--b) * .27px)); }
+.kb-xbar .kb-label { font-size: max(8px, calc(var(--s) * var(--b) * .22px)); }
+.kb-xbar.off { opacity: .35; }
+.kb-xsmall { position: absolute; background: rgba(0, 0, 0, .5); border: 1px solid #000; box-sizing: border-box; }
+.kb-xsmall img { width: 100%; height: 100%; display: block; }
+.kb-xghost { position: absolute; display: grid; place-items: center; border: 1px dashed rgba(230, 217, 184, .14); color: rgba(230, 217, 184, .28);
+  font-size: max(10px, calc(var(--s) * 13px)); pointer-events: none; }
+/* Edit Mode: the game's blue boxes over each bar, yellow on the selected one */
+.kb-xsel { position: absolute; inset: -2px; z-index: 3; display: grid; place-items: center; cursor: move; touch-action: none;
+  background: rgba(60, 140, 255, .3); border: 1px solid #5fb0ff; }
+.kb-xsel span { font: 700 max(10px, calc(var(--s) * 13px)) var(--font-body); color: #fff; text-shadow: 0 1px 2px #000; text-align: center; pointer-events: none; }
+.kb-xbar.sel .kb-xsel, .kb-xghost.sel .kb-xsel { background: rgba(255, 205, 60, .28); border-color: #ffd23c; }
+/* the other frames: movable in Edit Mode, under the bars and a little fainter */
+.kb-xghost .kb-xsel { inset: 0; z-index: 1; pointer-events: auto; background: rgba(60, 140, 255, .14); border-color: rgba(95, 176, 255, .6); }
+.kb-xsel:hover { background: rgba(90, 165, 255, .42); }
+.kb-gpanel { position: absolute; top: 12px; right: 12px; z-index: 6; width: min(300px, 46%); padding: 10px 14px 12px;
+  background: linear-gradient(#1b1710, #0c0a07); border: 1px solid var(--gold-dim); box-shadow: 0 6px 24px rgba(0, 0, 0, .7); }
+.kb-gpanel-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.kb-gpanel-h b { font: 700 18px var(--font-display); color: var(--gold-mid); }
+.kb-gclose { background: none; border: 0; color: var(--label); font-size: 22px; line-height: 1; cursor: pointer; }
+.kb-gclose:hover { color: var(--text); }
+.kb-gset { display: grid; grid-template-columns: 110px minmax(0, 1fr) 42px; align-items: center; gap: 8px; padding: 3px 0; font-size: 14px; color: var(--label); }
+.kb-gset select { grid-column: 2 / 4; background: #0c0a07; color: var(--text); border: 1px solid var(--line); padding: 3px 6px; font: 14px var(--font-body); }
+.kb-gset input { accent-color: var(--gold-mid); min-width: 0; }
+.kb-gset b { color: var(--text); font-size: 13px; text-align: right; }
+.kb-gpanel-f { margin-top: 6px; }
+.kb-gpanel .note { font-size: 14px; margin: 4px 0; }
+.kb-aspect select { background: #0c0a07; color: var(--text); border: 1px solid var(--line); padding: 3px 6px; font: 14px var(--font-body); }
+/* Edit Mode takes the whole page, like the game's */
+.kb-plan.editing .kb-book, .kb-plan.editing .kb-mouse, .kb-plan.editing .kb-layoutbar, .kb-plan.editing .kb-shared { display: none; }
+.kb-plan.editing .kb-cols { grid-template-columns: minmax(0, 1fr); }
+.kb-plan.editing .kb-screen { margin: 0 auto; }
+/* item names in their quality colour, as in game */
+.kb-spell.q0 b { color: #9d9d9d; } .kb-spell.q2 b { color: #1eff00; } .kb-spell.q3 b { color: #0070dd; } .kb-spell.q4 b { color: #a335ee; } .kb-spell.q5 b { color: #ff8000; }
+.kb-sb-cat { margin-left: 10px; vertical-align: 3px; background: #1a120a; color: #f0dfb8; border: 1px solid #5a4526; font: 14px var(--font-body); padding: 2px 4px; }
 
 .kb-mouse { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: minmax(200px, 250px) minmax(0, 1fr); gap: 10px 24px; align-items: start;
   background: var(--panel); border: 1px solid var(--line); padding: 12px 16px; }
@@ -245,7 +289,7 @@
 .kb-cast { position: relative; width: min(320px, 70vw); height: 18px; background: #111; border: 1px solid #000; }
 .kb-cast i { position: absolute; inset: 0 auto 0 0; background: #e8b23c; }
 .kb-cast b { position: relative; display: block; text-align: center; font: 700 12px/18px Arial; color: #fff; text-shadow: 1px 1px 0 #000; }
-.kb-live { align-self: center; background: rgba(0, 0, 0, .55); }
+.kb-live { align-self: stretch; background: none; border: 0; padding: 0; }  /* holds the cropped screen (screen.js) */
 .kb-runstats { display: flex; gap: 18px; color: var(--label); font-size: 15px; min-height: 22px; }
 .kb-runstats b { color: var(--gold-bright); }
 .kb-runbtns { position: absolute; right: 16px; bottom: 12px; }
@@ -298,4 +342,26 @@
   .kb-running .kb-still { display: none; }
   .kb-unit { width: 44vw; }
   .kb-party { top: auto; bottom: 8px; width: 150px; }
+}
+
+/* ---------- Put it in the game (plan.js exportHtml) ---------- */
+.kb-modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(0, 0, 0, .6); }
+.kb-modal-box { width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow: auto; padding: 14px 18px 16px;
+  background: linear-gradient(#1b1710, #0c0a07); border: 1px solid var(--gold-dim); box-shadow: 0 8px 32px rgba(0, 0, 0, .8); }
+.kb-xh { margin: 12px 0 2px; font: 700 16px var(--font-display); color: var(--gold-mid); }
+.kb-steps { margin: 4px 0 10px; padding-left: 22px; color: var(--text); font-size: 15px; line-height: 1.5; }
+.kb-steps b { color: var(--gold-mid); }
+.kb-emstr { display: flex; gap: 8px; align-items: flex-start; }
+.kb-emstr textarea { flex: 1; min-width: 0; resize: none; background: #0c0a07; color: var(--label); border: 1px solid var(--line);
+  font: 12px ui-monospace, Consolas, monospace; padding: 6px; word-break: break-all; }
+.kb-sheet table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.kb-sheet th { text-align: left; color: var(--label); font-weight: 600; border-bottom: 1px solid var(--line); padding: 4px 6px; }
+.kb-sheet td { padding: 3px 6px; border-bottom: 1px solid rgba(255, 255, 255, .05); color: var(--text); }
+.kb-sheet td.k { color: var(--gold-mid); font-weight: 700; white-space: nowrap; }
+.kb-sheet img { width: 20px; height: 20px; vertical-align: -5px; margin-right: 6px; }
+@media print {
+  body.kb-printing * { visibility: hidden; }
+  body.kb-printing .kb-sheet, body.kb-printing .kb-sheet * { visibility: visible; }
+  body.kb-printing .kb-sheet { position: absolute; left: 0; top: 0; width: 100%; }
+  body.kb-printing .kb-sheet td, body.kb-printing .kb-sheet th, body.kb-printing .kb-sheet td.k { color: #000; }
 }

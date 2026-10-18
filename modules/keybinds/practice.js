@@ -16,6 +16,8 @@ function practicePage(cls, spec, query) {
       healer: HEALER_SPECS.has(key), distance: cls === 'hunter' ? 'ranged' : 'melee', stealth: true }, saved[key] || {}) };
   tipCtx = kbTipCtx(cls);
   setupScreen();
+  // items on the bars need the item list for their icons
+  if (layoutHasItems(prac.layout)) kbLoadItems().then(() => { kbTipItems(tipCtx.abilities); if (document.getElementById('kb-livebars')) drawBars(); }).catch(() => {});
 }
 
 function stopPractice() {
@@ -165,8 +167,9 @@ function drawBars() {
   const { cls, layout, sim } = prac;
   const page = pageForForm(cls, sim.state.form);
   prac.page = page;
-  const bar = (id, items) => `<div class="kb-bar"><div class="kb-row">${items.map((it, i) => kbButton(cls, `${id}:${i}`, it, layout.binds[`${id}:${i}`])).join('')}</div></div>`;
-  document.getElementById('kb-livebars').innerHTML = [bar('b1', layout.pages[page]), ...EXTRA_BARS.slice(0, layout.shown).map(b => bar(b, layout.bars[b]))].reverse().join('');
+  const box = document.getElementById('kb-livebars');
+  box.innerHTML = screenHtml(layout, cls, { page, crop: true, screen: kbScreen() });
+  fitScreen(box.querySelector('.kb-screen'), Math.max(120, innerHeight * 0.3));
   prac.buttons = [...document.querySelectorAll('#kb-livebars .kb-btn')].map(el => {
     const it = itemAt(layout, el.dataset.slot, page);
     return { el, key: it && it.a, cd: el.querySelector('.kb-cd') };
@@ -177,7 +180,7 @@ function pressSlot(slot, via, repeat) {
   const it = itemAt(prac.layout, slot, prac.page);
   begin();
   if (!it) { if (!repeat) prac.sim.wrongKey(); return; }
-  if (!it.a) { flashError(`${it.label} isn't part of the practice`); return; }
+  if (!it.a) { flashError(`${it.i ? kbItem(it.i).name : it.label} isn't part of the practice`); return; }
   prac.sim.press(it.a, simNow(), repeat ? 'repeat' : via);
   const btn = prac.buttons.find(b => b.el.dataset.slot === slot);
   if (btn) { btn.el.classList.add('down'); setTimeout(() => btn.el.classList.remove('down'), 120); }
