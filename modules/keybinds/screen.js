@@ -11,10 +11,13 @@ const PET_CLASSES = new Set(['hunter', 'warlock']);
 // they can be moved. Two more can't: the bags, which follow the micro menu (BOTTOMLEFT on its BOTTOMRIGHT, 7,-4),
 // and the XP bar, which the game stacks itself. Sizes from the probe.
 const BAGS = { w: 315, h: 45, dx: 7, dy: -4 };
-const XP_BAR = { point: 'BOTTOM', x: -5, y: 51, w: 1192, h: 17 };
-// Every movable frame's rect on a screen: [{ id, rect }]
-function frameRects(layout, cls, scr) {
-  return framesFor(cls).map(id => { const f = FRAMES[id], p = framePos(layout, id); return { id, rect: placeRect(p.point, p.x, p.y, f.w, f.h, scr) }; });
+// the game's placement of everything for this class (geo.js gameRects)
+const classRects = (layout, cls, scr) => gameRects(layout, scr, { stance: stanceForms(cls).length, pet: PET_CLASSES.has(cls) });
+// Every movable frame's rect on a screen, at its size in the layout's preset: [{ id, rect }] (all of them when edit,
+// otherwise the ones on screen in game)
+function frameRects(layout, cls, scr, edit) {
+  const all = classRects(layout, cls, scr);
+  return framesFor(cls, edit, layout.show).map(id => ({ id, rect: all[id] }));
 }
 
 // the screen the visitor last picked in Edit Mode
@@ -27,17 +30,17 @@ const box = r => `left:${u(r.l)};bottom:${u(r.b)};width:${u(r.w)};height:${u(r.h
 const smallShape = n => ({ rows: 1, icons: Math.max(1, n), size: SMALL / BUTTON * 100, pad: 2 });
 function stanceForms(cls) { return (SPELLS[cls] && SPELLS[cls].forms || []).filter(f => !f.hidden); }
 
-// Every bar's rect on a screen: [{ id, rect, g }] (hidden bars only when withHidden).
-function barRects(layout, cls, scr, withHidden) {
-  const out = [];
+// Every bar's rect on a screen: [{ id, rect, g }] (bars switched off only when withOff, for Edit Mode).
+function barRects(layout, cls, scr, withOff) {
+  const all = classRects(layout, cls, scr), out = [];
   for (const id of ALL_BARS) {
     const g = layout.geo[id];
-    if (g.vis === 'hidden' && !withHidden) continue;
-    out.push({ id, g, rect: fromAnchor(g, scr) });
+    if (g.on === false && !withOff) continue;
+    out.push({ id, g, rect: all[id] });
   }
   const forms = stanceForms(cls);
-  if (forms.length) out.push({ id: 'stance', g: { ...smallShape(forms.length), ...layout.geo.stance }, rect: fromAnchor({ ...smallShape(forms.length), ...layout.geo.stance }, scr) });
-  if (PET_CLASSES.has(cls)) out.push({ id: 'pet', g: { ...smallShape(10), ...layout.geo.pet }, rect: fromAnchor({ ...smallShape(10), ...layout.geo.pet }, scr) });
+  if (forms.length) out.push({ id: 'stance', g: { ...smallShape(forms.length), ...layout.geo.stance }, rect: all.stance });
+  if (PET_CLASSES.has(cls)) out.push({ id: 'pet', g: { ...smallShape(10), ...layout.geo.pet }, rect: all.pet });
   return out;
 }
 
@@ -66,21 +69,21 @@ function screenHtml(layout, cls, opts = {}) {
         buttons += kbButton(cls, slot, items[i], layout.binds[slot], `style="left:${u(p.x)};top:${u(p.y)};--b:${p.size}"`);
       }
     }
-    const cls2 = `kb-xbar${g.vis === 'hidden' ? ' off' : ''}${opts.selected === id ? ' sel' : ''}`;
+    const cls2 = `kb-xbar${g.on === false || g.vis === 'hidden' ? ' off' : ''}${opts.selected === id ? ' sel' : ''}`;
+    const note = g.on === false ? ' (off)' : g.vis === 'hidden' ? ' (hidden)' : g.vis === 'combat' ? ' (in combat)' : g.vis === 'ooc' ? ' (out of combat)' : '';
     return `<div class="${cls2}" data-bar="${id}" style="${box(r)};--b:${btnSize}">${buttons}
-      ${opts.edit ? `<div class="kb-xsel" data-geo="${id}"><span>${BAR_NAMES[id]}${g.vis === 'hidden' ? ' (hidden)' : g.vis === 'combat' ? ' (in combat)' : g.vis === 'ooc' ? ' (out of combat)' : ''}</span></div>` : ''}</div>`;
+      ${opts.edit ? `<div class="kb-xsel" data-geo="${id}"><span>${BAR_NAMES[id]}${note}</span></div>` : ''}</div>`;
   }).join('');
   let ghosts = '';
   if (!opts.crop) {
-    // the off hand and ranged timers share the game's spot: one box until one of them is moved
-    const shared = !layout.frames.swingOff && !layout.frames.swingRanged;
-    const frames = frameRects(layout, cls, scr).filter(f => !(shared && f.id === 'swingRanged'));
-    const name = id => shared && id === 'swingOff' ? 'Off Hand / Ranged swing' : FRAMES[id].name;
+    const frames = frameRects(layout, cls, scr, opts.edit);
+    const off = id => FRAMES[id].toggle && !(layout.show && layout.show[FRAMES[id].toggle]);
+    const name = id => FRAMES[id].name + (FRAMES[id].editOnly ? ` (${FRAMES[id].editOnly})` : off(id) ? ' (off)' : '');
     const menu = frames.find(f => f.id === 'menu').rect;
-    ghosts = frames.map(({ id, rect }) => `<div class="kb-xghost${opts.selected === id ? ' sel' : ''}" style="${box(rect)}"><span>${name(id)}</span>
+    ghosts = frames.map(({ id, rect }) => `<div class="kb-xghost${off(id) ? ' off' : ''}${opts.selected === id ? ' sel' : ''}" style="${box(rect)}"><span>${name(id)}</span>
         ${opts.edit ? `<div class="kb-xsel" data-frame="${id}"><span>${name(id)}</span></div>` : ''}</div>`).join('')
       + `<div class="kb-xghost" style="${box({ l: menu.l + menu.w + BAGS.dx, b: menu.b + BAGS.dy, w: BAGS.w, h: BAGS.h })}"><span>Bags</span></div>`
-      + `<div class="kb-xghost" style="${box(placeRect(XP_BAR.point, XP_BAR.x, XP_BAR.y, XP_BAR.w, XP_BAR.h, scr))}"><span>XP</span></div>`;
+      + `<div class="kb-xghost" style="${box(classRects(layout, cls, scr).xp)}"><span>XP</span></div>`;
   }
   return `<div class="kb-screen${opts.edit ? ' editing' : ''}${opts.crop ? ' crop' : ''}" data-w="${view.w}" data-h="${view.h}" data-vl="${view.l}" data-vb="${view.b}"
     style="aspect-ratio:${view.w} / ${view.h}">${ghosts}${bars}</div>`;

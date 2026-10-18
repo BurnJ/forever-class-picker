@@ -51,7 +51,8 @@ function editModeString(layout) {
     const id = Object.keys(EM_BAR_INDEX).find(k => EM_BAR_INDEX[k] === r.index);
     const g = id && layout.geo[id];
     if (!g) continue;
-    pin(r, g);
+    // a bar that's home stays in the game's default position (the game stacks it); a moved one is pinned
+    if (g.home === false) pin(r, g);
     if ('icons' in g) {
       // Orientation, NumRows, NumIcons, IconSize (raw 0-15 = 50-200%), IconPadding, VisibleSetting
       const want = [g.vertical ? 1 : 0, g.rows, g.icons, (g.size - 50) / 10, g.pad, VIS.indexOf(g.vis)];

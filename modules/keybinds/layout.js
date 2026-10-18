@@ -30,10 +30,13 @@ function newLayout(cls, spec) {
   EXTRA_BARS.forEach(b => { bars[b] = Array(SLOTS).fill(null); });
   const binds = {};
   DEFAULT_BAR1.forEach((k, i) => { binds['b1:' + i] = k; });
-  return { v: 2, cls, spec, name: '', mouse: 'keyboard', pages, bars, binds, mouseKeys: {}, geo: defaultGeo(), frames: {}, preset: 'modern' };
+  return { v: 2, cls, spec, name: '', mouse: 'keyboard', pages, bars, binds, mouseKeys: {}, geo: defaultGeo(), frames: {}, preset: 'modern', show: newShow() };
 }
 // the bars the player shows (bar 1 always), in order
-const visibleBars = layout => ['b1', ...EXTRA_BARS.filter(b => layout.geo[b].vis !== 'hidden')];
+// the frame switches (geo.js TOGGLES), all off as in a new character
+const newShow = () => Object.fromEntries(Object.keys(TOGGLES).map(k => [k, false]));
+// the bars in use: bar 1 and the bars switched on (Options > Action Bars)
+const visibleBars = layout => ['b1', ...EXTRA_BARS.filter(b => layout.geo[b].on)];
 
 const parseSlot = id => { const [bar, i] = id.split(':'); return { bar, i: +i }; };
 const slotList = layout => visibleBars(layout)
@@ -70,9 +73,9 @@ const slotForBind = (layout, bind) => Object.keys(layout.binds).find(s => layout
 
 /* ---------- share codec ----------
    JSON with abilities stored as their rank-1 spell id (stable across data rebuilds), items as minus their
-   item id, then base64url. Version 2 adds bars 7-8, items, geometry, moved frames and the Edit Mode preset (u); version 1 links still open (with
-   the default geometry and their bar count). A link that doesn't decode gives { error } instead of a
-   half-built layout. */
+   item id, then base64url. Version 2 adds bars 7-8, items, geometry (with each bar's on switch), moved frames,
+   the Edit Mode preset (u) and the frame switches (w); version 1 links still open (with the default geometry and
+   their bar count). A link that doesn't decode gives { error } instead of a half-built layout. */
 const CODEC_VERSION = 2;
 const POINTS = ['TOPLEFT', 'TOP', 'TOPRIGHT', 'LEFT', 'CENTER', 'RIGHT', 'BOTTOMLEFT', 'BOTTOM', 'BOTTOMRIGHT'];
 const b64url = s => {
@@ -103,17 +106,21 @@ function unpackItems(arr, keyOf) {
 function encode(layout, spells) {
   const idOf = key => { const a = spells.abilities.find(x => x.key === key); return a && a.ranks[0].spell; };
   const o = { v: CODEC_VERSION, c: layout.cls, s: layout.spec, n: layout.name || '', m: layout.mouse,
-    p: {}, b: {}, k: layout.binds, mk: layout.mouseKeys, g: packGeo(layout.geo), f: packGeo(layout.frames || {}), u: layout.preset || 'modern' };
+    p: {}, b: {}, k: layout.binds, mk: layout.mouseKeys, g: packGeo(layout.geo), f: packGeo(layout.frames || {}), u: layout.preset || 'modern',
+    w: Object.keys(TOGGLES).filter(k => layout.show && layout.show[k]) };
   for (const [page, arr] of Object.entries(layout.pages)) o.p[page] = packItems(arr, idOf);
   for (const [bar, arr] of Object.entries(layout.bars)) { const p = packItems(arr, idOf); if (p.length) o.b[bar] = p; }
   return b64url(JSON.stringify(o));
 }
-// geometry as short arrays: [point, x, y, rows, icons, size, pad, vertical, visibility] (stance/pet: the first three)
+// geometry as short arrays: bars [point, x, y, rows, icons, size, pad, vertical, visibility, on, home] (bar 1's on is
+// always 1); stance/pet [point, x, y, home]. Moved frames: [point, x, y].
 function packGeo(geo) {
   const out = {};
   for (const [k, g] of Object.entries(geo)) {
     const head = [POINTS.indexOf(g.point), g.x, g.y];
-    out[k] = 'icons' in g ? [...head, g.rows, g.icons, g.size, g.pad, g.vertical ? 1 : 0, VIS.indexOf(g.vis)] : head;
+    const shape = [g.rows, g.icons, g.size, g.pad, g.vertical ? 1 : 0, VIS.indexOf(g.vis), g.on === false ? 0 : 1];
+    const home = 'home' in g ? [g.home === false ? 0 : 1] : [];
+    out[k] = 'icons' in g ? [...head, ...shape, ...home] : [...head, ...home];
   }
   return out;
 }
@@ -123,8 +130,14 @@ function unpackGeo(packed) {
   for (const k of Object.keys(geo)) {
     const a = Object.prototype.hasOwnProperty.call(packed, k) && Array.isArray(packed[k]) ? packed[k] : null;
     if (!a) continue;
+    const bit = v => (v === 1 ? true : v === 0 ? false : undefined);
+    const shaped = 'icons' in geo[k], on = shaped ? bit(a[9]) : undefined, home = bit(shaped ? a[10] : a[3]);
     geo[k] = cleanGeo({ point: POINTS[a[0]], x: a[1], y: a[2], rows: a[3], icons: a[4], size: a[5], pad: a[6],
-      vertical: a[7] === 1 ? true : a[7] === 0 ? false : undefined, vis: VIS[a[8]] }, geo[k]);
+      vertical: a[7] === 1 ? true : a[7] === 0 ? false : undefined, vis: VIS[a[8]], on, home }, geo[k]);
+    // saved before bars had an on switch: Hidden meant not in use
+    if ('on' in geo[k] && on === undefined) { geo[k].on = geo[k].vis !== 'hidden'; if (!geo[k].on) geo[k].vis = 'always'; }
+    // saved before the home flag: home if it's at a spot the planner used as the default
+    if (home === undefined) geo[k].home = wasHome(k, geo[k]);
   }
   return geo;
 }
@@ -156,10 +169,13 @@ function decodeUnsafe(str, spellsByClass, mice) {
   const layout = newLayout(o.c, String(o.s || ''));
   layout.name = String(o.n || '').slice(0, 40);
   layout.mouse = own(mice || { keyboard: 1, two: 1, g600: 1, naga: 1, scimitar: 1 }, o.m) ? o.m : 'keyboard';
-  if (o.v === 1) {  // bars 2..x+1 shown, the rest hidden
+  if (o.v === 1) {  // bars 2..x+1 on, the rest off
     const shown = Math.max(0, Math.min(5, +o.x || 0));
-    EXTRA_BARS.forEach((b, i) => { layout.geo[b].vis = i < shown ? 'always' : 'hidden'; });
-  } else { layout.geo = unpackGeo(o.g); layout.frames = unpackFrames(o.f); layout.preset = o.u === 'classic' ? 'classic' : 'modern'; }
+    EXTRA_BARS.forEach((b, i) => { layout.geo[b].on = i < shown; });
+  } else {
+    layout.geo = unpackGeo(o.g); layout.frames = unpackFrames(o.f); layout.preset = o.u === 'classic' ? 'classic' : 'modern';
+    for (const k of Array.isArray(o.w) ? o.w : []) if (own(TOGGLES, k)) layout.show[k] = true;
+  }
   for (const page of Object.keys(layout.pages)) layout.pages[page] = unpackItems(o.p && o.p[page], keyOf);
   for (const bar of EXTRA_BARS) layout.bars[bar] = unpackItems(o.b && o.b[bar], keyOf);
   layout.binds = {};

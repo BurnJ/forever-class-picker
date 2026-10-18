@@ -93,7 +93,7 @@ function renderPlan() {
   fitPlanScreen();
 }
 function hintText() {
-  if (plan.editMode) return 'Drag a bar to move it. Click a bar to change its shape and when it shows.';
+  if (plan.editMode) return 'Drag a bar to move it. Click a bar to change its shape and when it shows. Tick a bar under Show to switch it on.';
   if (plan.bindMode) return 'Hover a button and press a key or mouse button. Right-click clears it.';
   const p = plan.picked;
   if (p) return `Click a button to place <b>${esc(p.a || (p.i ? kbItem(p.i).name : p.label))}</b>. Esc cancels.`;
@@ -201,14 +201,24 @@ function barsHtml() {
     : (SPELLS[cls].forms.find(f => 'f' + f.id === p) || { name: p }).name;
   return `${pages.length > 1 && !plan.editMode ? `<div class="kb-pages seg" role="group" aria-label="Bar 1 page"><span>Bar 1 shows</span>${pages.map(p =>
       `<button type="button" data-page="${p}" aria-pressed="${p === plan.page}">${esc(formName(p))}</button>`).join('')}</div>` : ''}
+    ${plan.editMode ? showHtml() : ''}
     ${screenHtml(layout, cls, { page: plan.page, edit: plan.editMode, selected: plan.selBar, screen: SCREENS[plan.screen] })}
     ${plan.editMode && plan.selBar ? geoPanelHtml(plan.selBar) : ''}`;
+}
+// The game's settings switches, which Edit Mode doesn't hold: bars 2-8 (Options > Action Bars) and the frames in
+// geo.js TOGGLES. All off in a new character.
+function showHtml() {
+  const { layout } = plan;
+  const box = (key, label, on) => `<label class="kb-check"><input type="checkbox" data-show="${key}"${on ? ' checked' : ''}>${label}</label>`;
+  return `<div class="kb-show" role="group" aria-label="Switched on in the game's settings"><span>Show</span>
+    ${EXTRA_BARS.map(b => box(b, BAR_NAMES[b], layout.geo[b].on)).join('')}
+    ${Object.entries(TOGGLES).map(([k, label]) => box(k, label, layout.show[k])).join('')}</div>`;
 }
 // Edit Mode's settings window for one bar, with the game's own settings and ranges
 function geoPanelHtml(id) {
   if (FRAMES[id]) return `<div class="kb-gpanel" role="dialog" aria-label="${FRAMES[id].name}">
     <div class="kb-gpanel-h"><b>${FRAMES[id].name}</b><button type="button" class="kb-gclose" data-act="unselect" aria-label="Close">&times;</button></div>
-    <p class="note">Drag it to move it. ${plan.layout.frames[id] ? 'It goes in the import at this spot.' : 'It stays where the game puts it until you move it.'}</p>
+    <p class="note">Drag it to move it. ${plan.layout.frames[id] ? 'It goes in the import at this spot.' : 'It stays where the game puts it until you move it.'}${FRAMES[id].toggle && !plan.layout.show[FRAMES[id].toggle] ? ` It's off: tick ${TOGGLES[FRAMES[id].toggle]} under Show to see it outside Edit Mode.` : ''}</p>
     <div class="kb-gpanel-f"><button type="button" class="kb-link" data-act="resetbar">Reset to default position</button></div>
   </div>`;
   const g = plan.layout.geo[id];
@@ -217,6 +227,8 @@ function geoPanelHtml(id) {
     <input type="range" data-gset="${k}" min="${min}" max="${max}" step="${step}" value="${g[k]}"><b>${g[k]}${unit}</b></label>`;
   return `<div class="kb-gpanel" role="dialog" aria-label="${BAR_NAMES[id]} settings">
     <div class="kb-gpanel-h"><b>${BAR_NAMES[id]}</b><button type="button" class="kb-gclose" data-act="unselect" aria-label="Close">&times;</button></div>
+    ${g.on === false ? `<p class="note">It's switched off, as in a new character. Tick it under Show to use it.</p>` : ''}
+    ${g.home !== false ? '<p class="note">The game places it, next to the bars around it, until you drag it.</p>' : ''}
     ${small ? '<p class="note">Drag it to move it. Its buttons come from your class.</p>' : `
     <label class="kb-gset"><span>Orientation</span><select data-gset="vertical"><option value="0"${g.vertical ? '' : ' selected'}>Horizontal</option><option value="1"${g.vertical ? ' selected' : ''}>Vertical</option></select></label>
     ${range('rows', g.vertical ? '# of Columns' : '# of Rows', 1, 4, 1)}
@@ -238,7 +250,7 @@ function redrawScreen() {
 function fitPlanScreen() {
   const el = document.querySelector('.kb-plan .kb-screen');
   if (!el) return;
-  fitScreen(el, plan.editMode ? Math.max(300, innerHeight - 190) : Math.max(260, innerHeight - 340));
+  fitScreen(el, plan.editMode ? Math.max(300, innerHeight - 225) : Math.max(260, innerHeight - 340));
   // and smaller still if the page would scroll
   const over = document.documentElement.scrollHeight - innerHeight;
   if (over > 0) fitScreen(el, Math.max(240, el.getBoundingClientRect().height - over));
@@ -313,7 +325,7 @@ function wirePlan() {
     else if (act === 'unselect') { plan.selBar = null; redrawScreen(); }
     else if (act === 'resetbar' && plan.selBar) {
       if (FRAMES[plan.selBar]) delete plan.layout.frames[plan.selBar];
-      else { const d = defaultGeo()[plan.selBar], g = plan.layout.geo[plan.selBar]; Object.assign(g, { point: d.point, x: d.x, y: d.y }); }
+      else { const d = defaultGeo()[plan.selBar]; Object.assign(plan.layout.geo[plan.selBar], { point: d.point, x: d.x, y: d.y, home: true }); }
       planSave(); redrawScreen();
     }
     else if (act === 'resetpos') { resetToPreset(); setMsg(`Bars and frames are back where ${PRESETS[plan.layout.preset || 'modern']} puts them.`); }
@@ -351,6 +363,11 @@ function wirePlan() {
     if (e.target.id === 'kb-preset') { plan.layout.preset = e.target.value; resetToPreset(); setMsg(`Started from ${PRESETS[plan.layout.preset]}. Your abilities and keys stay.`); }
     if (e.target.id === 'kb-screen') { plan.screen = e.target.value; kbStore.set('kb:screen', plan.screen); redrawScreen(); }
     if (e.target.dataset.gset === 'vertical' || e.target.dataset.gset === 'vis') setGeo(e.target);
+    if (e.target.dataset.show) {
+      const k = e.target.dataset.show;
+      if (EXTRA_BARS.includes(k)) plan.layout.geo[k].on = e.target.checked; else plan.layout.show[k] = e.target.checked;
+      planSave(); redrawScreen();
+    }
   });
   root.addEventListener('input', e => {
     if (e.target.id === 'kb-name') { plan.layout.name = e.target.value; planSave(); }
@@ -458,10 +475,10 @@ function wireBook() {
 
 /* ---------- Edit Mode: move a bar, change its settings ---------- */
 // Every bar and frame back where the layout's Edit Mode preset puts them, the way picking a preset in game does.
-// Abilities, keys and which bars are shown stay.
+// Abilities, keys, which bars are on and when they show stay.
 function resetToPreset() {
   const home = defaultGeo();
-  for (const [id, g] of Object.entries(plan.layout.geo)) Object.assign(g, home[id], 'vis' in g ? { vis: g.vis } : {});
+  for (const [id, g] of Object.entries(plan.layout.geo)) Object.assign(g, home[id], 'vis' in g ? { vis: g.vis } : {}, 'on' in g ? { on: g.on } : {});
   plan.layout.frames = {};
   plan.selBar = null;
   planSave(); redrawScreen();
@@ -487,9 +504,9 @@ function moveBar(e, id, barEl) {
   const el = document.querySelector('.kb-plan .kb-screen');
   const s = parseFloat(el.style.getPropertyValue('--s')) || 1;
   const scr = screenSize(SCREENS[plan.screen].aspect, SCREENS[plan.screen].h);
-  const rects = [...barRects(plan.layout, plan.cls, scr, true), ...frameRects(plan.layout, plan.cls, scr)];
+  const rects = [...barRects(plan.layout, plan.cls, scr, true), ...frameRects(plan.layout, plan.cls, scr, true)];
   const me = rects.find(r => r.id === id);
-  const others = rects.filter(r => r.id !== id && !(r.g && r.g.vis === 'hidden')).map(r => r.rect);
+  const others = rects.filter(r => r.id !== id && !(r.g && r.g.on === false)).map(r => r.rect);
   const x0 = e.clientX, y0 = e.clientY;
   let moved = false, rect = me.rect;
   const move = ev => {
@@ -504,7 +521,7 @@ function moveBar(e, id, barEl) {
     plan.selBar = id;
     if (moved) {
       if (FRAMES[id]) plan.layout.frames[id] = toAnchor(rect, scr);
-      else Object.assign(plan.layout.geo[id], toAnchor(rect, scr));
+      else Object.assign(plan.layout.geo[id], toAnchor(rect, scr), { home: false });  // out of the game's default position
       planSave();
       plan.dragged = true; setTimeout(() => { plan.dragged = false; }, 0);
     }

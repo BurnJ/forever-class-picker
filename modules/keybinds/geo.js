@@ -85,45 +85,163 @@ function snap(rect, others, scr, d = SNAP) {
 }
 const clamp = (r, scr) => ({ l: Math.max(0, Math.min(scr.w - r.w, r.l)), b: Math.max(0, Math.min(scr.h - r.h, r.b)), w: r.w, h: r.h });
 
-// Where Forever's Modern preset puts each bar, as an anchor on the screen.
-//   b1: pinned to the micro menu's left (menu BOTTOM 116.5,6, 302 wide; the bar 4.5 left of it, 4 lower).
-//   b4, b5: RIGHT -5,-77, vertical. b6-b8: their top edge at the screen centre, then 50 and 100 lower.
-//   b2, b3, stance and pet sit in the game's bottom stack: provisional until the second probe run.
-// Bars 4-8 start hidden. Stance and pet bars are placed, not shaped.
+// The bars' shapes and, once moved, their spots. `home` is Edit Mode's "in default position": the game places a bar
+// that's home itself (gameRects), so its point/x/y only matter once it's been dragged. They hold where each bar sits
+// on a 16:9 screen with every bar on, for links and old saves.
+// `on` is the game's Options > Action Bars switch for bars 2-8, off in a new character (probe run 1); it isn't part
+// of an Edit Mode layout. `vis` is Edit Mode's Bar Visible setting. Stance and pet bars are placed, not shaped.
 function defaultGeo() {
-  const bar = (point, x, y, o = {}) => Object.assign({ point, x, y, rows: 1, icons: 12, size: 100, pad: 2, vertical: false, vis: 'always' }, o);
+  const bar = (point, x, y, o = {}) => Object.assign({ point, x, y, rows: 1, icons: 12, size: 100, pad: 2, vertical: false, vis: 'always', home: true }, o);
+  const extra = (point, x, y, o = {}) => bar(point, x, y, Object.assign({ on: false }, o));
   return {
-    b1: bar('BOTTOM', -320, 2), b2: bar('BOTTOM', -320, 72), b3: bar('BOTTOM', -320, 121),
-    b4: bar('RIGHT', -5, -77, { vertical: true, vis: 'hidden' }), b5: bar('RIGHT', -52, -77, { vertical: true, vis: 'hidden' }),
-    b6: bar('CENTER', 0, -22.5, { vis: 'hidden' }), b7: bar('CENTER', 0, -72.5, { vis: 'hidden' }), b8: bar('CENTER', 0, -122.5, { vis: 'hidden' }),
-    stance: { point: 'BOTTOM', x: -470, y: 170 }, pet: { point: 'BOTTOM', x: -150, y: 170 },
+    b1: bar('BOTTOM', -320, 2), b2: extra('BOTTOM', -298, 72), b3: extra('BOTTOM', 286, 72),
+    b4: extra('RIGHT', -5, -77, { vertical: true }), b5: extra('RIGHT', -55, -77, { vertical: true }),
+    b6: extra('CENTER', 0, -22.5), b7: extra('CENTER', 0, -72.5), b8: extra('CENTER', 0, -122.5),
+    stance: { point: 'BOTTOM', x: -556, y: 121, home: true }, pet: { point: 'BOTTOM', x: -412, y: 155, home: true },
   };
 }
+// Spots that meant "where the game puts it" in layouts saved before bars had a home flag (each default the planner
+// has used), so those bars go back to following the game.
+const OLD_HOMES = {
+  b1: [['BOTTOM', -320, 2]], b2: [['BOTTOM', -320, 72], ['BOTTOM', -298, 70], ['BOTTOM', -298, 72]],
+  b3: [['BOTTOM', -320, 121], ['BOTTOM', 286, 70], ['BOTTOM', 286, 72]], b4: [['RIGHT', -5, -77]],
+  b5: [['RIGHT', -52, -77], ['RIGHT', -55, -77]], b6: [['CENTER', 0, -22.5]], b7: [['CENTER', 0, -72.5]],
+  b8: [['CENTER', 0, -122.5]], stance: [['BOTTOM', -470, 170], ['BOTTOM', -571, 121]], pet: [['BOTTOM', -150, 170]],
+};
+const wasHome = (id, g) => (OLD_HOMES[id] || []).some(([p, x, y]) => g.point === p && g.x === x && g.y === y);
 
-// The game's other Edit Mode frames, which the planner can move but not reshape: Forever's Modern preset, sizes from
-// the probe's frame rects. `classic` is the frame's spot in the Classic preset when it differs (its string, editmode.js). system and index are the record's in the Edit Mode string (Enum.EditModeSystem, system index).
-// The player and target frames are pinned by their inner corners in game; these are the same spots from the centre.
-// The swing timers sit where the game puts them while in their default position (probe rects); the off hand
-// and ranged timers share a spot. `classes` limits a frame to the classes that can use it.
+// The game's other Edit Mode frames, which the planner can move but not reshape. Spots and sizes are the game's own
+// rects in each preset (/fkbprobe presets, 2026-10-18, docs/forever-actionbar-facts.md); `classic` is what differs in
+// the Classic preset. system and index are the record's in the Edit Mode string (Enum.EditModeSystem, system index).
+// The player and target frames are pinned by their inner corners in Modern; these are the same spots from the centre.
+// `editOnly` frames are only on screen in a group, so the planner shows them in Edit Mode only, the way the game does.
+// `toggle` frames are switched on in the game's settings and off in a new character (TOGGLES, layout.show): shown
+// when switched on, and always in Edit Mode, marked off. The swing timers are stacked as Edit Mode shows them with
+// all three on. Out of Edit Mode the game shows only the ones for what's equipped. The swing timers, the objective
+// tracker and the pet frame are placed by the game around other frames (gameRects); their point/x/y here are only
+// their spot on a 16:9 screen with bars 2-8 off.
+// `classes` limits a frame to the classes that can use it.
 const FRAMES = {
   player: { name: 'Player', system: 3, index: 1, w: 232, h: 100, point: 'BOTTOM', x: -416, y: 250, classic: { point: 'TOPLEFT', x: 4, y: -4 } },
   target: { name: 'Target', system: 3, index: 2, w: 232, h: 100, point: 'BOTTOM', x: 416, y: 250, classic: { point: 'TOPLEFT', x: 250, y: -4 } },
+  // Modern: BOTTOMLEFT at BOTTOM 520, 265; 232 x 100 at scale 0.75
+  focus: { name: 'Focus', system: 3, index: 3, w: 174, h: 75, point: 'BOTTOM', x: 607, y: 265, classic: { point: 'TOPLEFT', x: 500, y: -240 }, editOnly: 'with a focus' },
+  // under the player frame (PlayerBottomManagedFrameContainer); provisional: camelot's petframe.lua isn't in the extract
+  petFrame: { name: 'Pet', system: 3, index: 8, w: 120, h: 49, point: 'BOTTOM', x: -393.5, y: 226, classic: { point: 'TOPLEFT', x: 97.5, y: -79 }, editOnly: 'with a pet', classes: ['hunter', 'warlock'] },
+  party: { name: 'Party', system: 3, index: 4, w: 120, h: 244, point: 'TOPLEFT', x: 22, y: -147, editOnly: 'in a group' },
   minimap: { name: 'Minimap', system: 2, index: 0, w: 273, h: 283, point: 'TOPRIGHT', x: 0, y: 0 },
-  chat: { name: 'Chat', system: 8, index: 0, w: 430, h: 170, point: 'BOTTOMLEFT', x: 35, y: 145 },
+  objectives: { name: 'Objectives', system: 12, index: 0, w: 260, h: 791, point: 'TOPRIGHT', x: -5, y: -286 },
+  // Edit Mode's chat height setting (id 3) is the height less 100: Modern 70, Classic 20
+  chat: { name: 'Chat', system: 8, index: 0, w: 430, h: 170, point: 'BOTTOMLEFT', x: 35, y: 145, classic: { h: 120 } },
   buffs: { name: 'Buffs', system: 6, index: 1, w: 400, h: 135, point: 'TOPRIGHT', x: -255, y: -10 },
   debuffs: { name: 'Debuffs', system: 6, index: 2, w: 280, h: 90, point: 'TOPRIGHT', x: -270, y: -155 },
   menu: { name: 'Menu', system: 13, index: 0, w: 302, h: 40, point: 'BOTTOM', x: 116.5, y: 6 },
-  swingMain: { name: 'Main Hand swing', system: 29, index: 1, w: 426, h: 30, point: 'BOTTOM', x: 0, y: 265 },
-  swingOff: { name: 'Off Hand swing', system: 29, index: 2, w: 426, h: 30, point: 'BOTTOM', x: 0, y: 231, classes: ['rogue', 'warrior', 'hunter'] },
-  swingRanged: { name: 'Ranged swing', system: 29, index: 3, w: 426, h: 30, point: 'BOTTOM', x: 0, y: 231, classes: ['rogue', 'warrior', 'hunter'] },
+  swingMain: { name: 'Main Hand swing', system: 29, index: 1, w: 426, h: 30, point: 'BOTTOM', x: 0, y: 149, toggle: 'swing' },
+  swingOff: { name: 'Off Hand swing', system: 29, index: 2, w: 426, h: 30, point: 'BOTTOM', x: 0, y: 115, toggle: 'swing' },
+  swingRanged: { name: 'Ranged swing', system: 29, index: 3, w: 426, h: 30, point: 'BOTTOM', x: 0, y: 81, toggle: 'swing' },
+  meter: { name: 'Damage Meter', system: 23, index: 0, w: 400, h: 140, point: 'TOPLEFT', x: 0, y: 0, toggle: 'meter' },
 };
-const framesFor = cls => Object.keys(FRAMES).filter(k => !FRAMES[k].classes || FRAMES[k].classes.includes(cls));
+// the game's settings switches for frames, by layout.show key
+const TOGGLES = { swing: 'Swing Timer', meter: 'Damage Meter' };
+// the frames a class sees: all of them in Edit Mode (edit), otherwise not editOnly ones or toggle ones switched off (show)
+const framesFor = (cls, edit, show) => Object.keys(FRAMES).filter(k => {
+  const f = FRAMES[k];
+  if (f.classes && !f.classes.includes(cls)) return false;
+  return edit || (!f.editOnly && (!f.toggle || !!(show && show[f.toggle])));
+});
 // the Edit Mode presets a layout can start from; the bars sit the same in both, the unit frames don't
 const PRESETS = { modern: 'Modern', classic: 'Classic' };
-// where the game puts a frame in a preset
-const frameHome = (key, preset) => (preset === 'classic' && FRAMES[key].classic) || FRAMES[key];
-// where a frame is: moved (layout.frames) or the preset's spot
-const framePos = (layout, key) => (layout.frames && layout.frames[key]) || frameHome(key, layout.preset);
+// where the game puts a frame in a preset, and its size there
+const frameHome = (key, preset) => (preset === 'classic' && FRAMES[key].classic ? Object.assign({}, FRAMES[key], FRAMES[key].classic) : FRAMES[key]);
+// The bottom of a bar 1 page's status bar (the XP bar): the game stacks it on bar 1.
+const XP_SIZE = { w: 1192, h: 17 };
+
+// Every bar's and frame's rect on a screen, placed by the game's own rules (docs/forever-ui-layout-rules.md, from the
+// client's Edit Mode and UIParentPanelManager code; both /fkbprobe presets runs reproduce). Moved bars and frames sit at
+// their anchors; the rest are placed around them the way the game does:
+//   - bar 1's BOTTOMRIGHT on the micro menu's BOTTOMLEFT, -4.5, -4;
+//   - the bottom stack on bar 1's BOTTOMLEFT, 4 apart: the XP bar, bar 3 (x 606, adds no height), bar 2 (x 22), stance
+//     bar (x 30), pet bar (x 30). Bars that are off or moved drop out and the stack closes up;
+//   - the bottom container (swing timers, 10 apart, centred) from bar 2's top + 35 when bar 2 is on, home and visible,
+//     else from the micro menu's top + 35 (81);
+//   - bars 4 then 5 from RIGHT -5, -77, each next one its width + 5 further left;
+//   - the right container (objective tracker) 5 left of the outermost visible right bar, from 260 below the top, the
+//     tracker's top 26 lower and its bottom at the minimap's height less 160;
+//   - bars 6-8 with their tops on the screen centre, 50 apart; the pet frame under the player frame.
+// The XP bar is assumed shown (players plan while levelling). n: { stance: buttons (0 = no stance bar), pet: bool }.
+// Returns { [bar or frame id]: { l, b, w, h }, xp }; bars that are off get the spot they'd take if switched on.
+function gameRects(layout, scr, n = {}) {
+  const geo = layout.geo, moved = layout.frames || {}, out = {};
+  const small = buttons => barSize({ rows: 1, icons: Math.max(1, buttons), size: 30 / BUTTON * 100, pad: 2 });
+  const sizeOf = id => (id === 'stance' ? small(n.stance) : id === 'pet' ? small(10) : barSize(geo[id]));
+  const anchored = id => { const g = geo[id], sz = sizeOf(id); return placeRect(g.point, g.x, g.y, sz.w, sz.h, scr); };
+  const home = id => geo[id].home !== false;
+  const frame = key => {
+    const f = frameHome(key, layout.preset), m = moved[key];
+    return m ? placeRect(m.point, m.x, m.y, f.w, f.h, scr) : null;
+  };
+  const presetFrame = key => { const f = frameHome(key, layout.preset); return placeRect(f.point, f.x, f.y, f.w, f.h, scr); };
+  const shownAt = g => g.vis === 'always' || g.vis === 'ooc';  // visible out of combat
+
+  const menu = frame('menu') || presetFrame('menu');
+  out.menu = menu;
+  // bar 1 and the bottom stack
+  const s1 = sizeOf('b1');
+  const b1 = out.b1 = home('b1') ? { l: menu.l - 4.5 - s1.w, b: menu.b - 4, w: s1.w, h: s1.h } : anchored('b1');
+  let y = b1.h + 4;
+  out.xp = { l: b1.l, b: b1.b + y, w: XP_SIZE.w, h: XP_SIZE.h };
+  y += XP_SIZE.h + 4;
+  const stack = (id, dx, adds) => {
+    const sz = sizeOf(id);
+    if (!home(id)) { out[id] = anchored(id); return; }
+    out[id] = { l: b1.l + dx, b: b1.b + y, w: sz.w, h: sz.h };
+    if (adds) y += sz.h + 4;
+  };
+  stack('b3', 606, false);
+  const b2y = y;
+  stack('b2', 22, geo.b2.on);
+  if (n.stance) stack('stance', 30, true);
+  if (n.pet) stack('pet', 30, true);
+  // the bottom container
+  const b2counts = geo.b2.on && home('b2') && shownAt(geo.b2);
+  const y0 = b2counts ? b2y + out.b2.h + 35 : moved.menu ? 35 : Math.abs(FRAMES.menu.y) + menu.h + 35;
+  const timers = ['swingRanged', 'swingOff', 'swingMain'];
+  let ty = y0;
+  for (const key of timers) {
+    const f = frameHome(key, layout.preset);
+    out[key] = frame(key) || { l: scr.w / 2 - f.w / 2, b: ty + (key === 'swingRanged' ? 0 : -6), w: f.w, h: f.h };
+    ty += f.h + 10 + (key === 'swingRanged' ? 0 : -6);
+  }
+  // bars 4 and 5, then the right container
+  let rx = -5;
+  for (const id of ['b4', 'b5']) {
+    const sz = sizeOf(id);
+    if (!home(id)) { out[id] = anchored(id); continue; }
+    out[id] = placeRect('RIGHT', rx, -77, sz.w, sz.h, scr);
+    if (geo[id].on) rx -= sz.w + 5;
+  }
+  const outer = ['b5', 'b4'].find(id => geo[id].on && home(id) && shownAt(geo[id]));
+  const rbw = outer ? scr.w - out[outer].l : 0;
+  const tracker = frameHome('objectives', layout.preset), minimapH = frameHome('minimap', layout.preset).h;
+  out.objectives = frame('objectives') ||
+    { l: scr.w - 5 - rbw - tracker.w, b: minimapH - 160, w: tracker.w, h: scr.h - 286 - (minimapH - 160) };
+  // bars 6-8: top edge on the centre, 50 apart
+  ['b6', 'b7', 'b8'].forEach((id, i) => {
+    const sz = sizeOf(id);
+    out[id] = home(id) ? { l: scr.w / 2 - sz.w / 2, b: scr.h / 2 - 50 * i - sz.h, w: sz.w, h: sz.h } : anchored(id);
+  });
+  // the other frames: moved, or the preset's spot; the pet frame follows the player frame
+  for (const key of Object.keys(FRAMES)) {
+    if (out[key]) continue;
+    if (key === 'petFrame' && !moved.petFrame) {
+      const p = out.player || frame('player') || presetFrame('player'), f = FRAMES.petFrame;
+      out.petFrame = { l: p.l + p.w / 2 - 22.5, b: p.b - 24, w: f.w, h: f.h };
+      continue;
+    }
+    out[key] = frame(key) || presetFrame(key);
+  }
+  return out;
+}
 
 // Keep a geometry record inside what Edit Mode allows (anything from a link is untrusted).
 function cleanGeo(g, dflt) {
@@ -138,9 +256,11 @@ function cleanGeo(g, dflt) {
     out.pad = Math.round(num(o.pad, 2, 10, dflt.pad));
     out.vertical = typeof o.vertical === 'boolean' ? o.vertical : dflt.vertical;
     out.vis = VIS.includes(o.vis) ? o.vis : dflt.vis;
+    if ('on' in dflt) out.on = typeof o.on === 'boolean' ? o.on : dflt.on;
   }
+  if ('home' in dflt) out.home = typeof o.home === 'boolean' ? o.home : dflt.home;
   return out;
 }
 
 if (typeof module !== 'undefined') module.exports = { SCREENS, BUTTON, ALL_BARS, VIS, screenSize, barSize, buttonPos,
-  pointFor, toAnchor, placeRect, fromAnchor, snap, defaultGeo, cleanGeo, FRAMES, framesFor, framePos, frameHome, PRESETS };
+  pointFor, toAnchor, placeRect, fromAnchor, snap, defaultGeo, wasHome, gameRects, cleanGeo, FRAMES, framesFor, frameHome, PRESETS, TOGGLES };

@@ -6,6 +6,7 @@
      class <cls>
      name <layout name>
      bars <extra bars to switch on, e.g. 2,3>
+     show <the game's switches to turn on: swing (Swing Timer), meter (Damage Meter); left out when none>
      s <action slot> <spell ids, rank 1 first, comma separated> <rank 1's level> <name>
      i <action slot> <item id> <name>
      k <key> <binding command>
@@ -13,7 +14,7 @@
    Needs layout.js and the spell data. */
 
 // the addon's download (tools/build_addon.py makes it from addon/ForeverKeybinds; keep the version in step with the .toc)
-const ADDON_ZIP = '/downloads/ForeverKeybinds-0.1.0.zip';
+const ADDON_ZIP = '/downloads/ForeverKeybinds-0.2.0.zip';
 // first action slot of each bar
 const BAR_FIRST_SLOT = { b2: 61, b3: 49, b4: 25, b5: 37, b6: 145, b7: 157, b8: 169 };
 // first action slot of each bar 1 page: the game's bonus bars (GetBonusBarOffset 1-4 -> 73, 85, 97, 109).
@@ -30,6 +31,8 @@ function addonLines(layout, spells, items = []) {
   const lines = ['FKB 1', `class ${layout.cls}`, `name ${clean(layout.name || 'Forever Keybinds')}`];
   const extra = visibleBars(layout).filter(b => b !== 'b1');
   lines.push(`bars ${extra.map(b => b.slice(1)).join(',')}`);
+  const show = Object.keys(TOGGLES).filter(k => layout.show && layout.show[k]);
+  if (show.length) lines.push(`show ${show.join(',')}`);
   const put = (slot, it) => {
     if (!it) return;
     if (it.a) {
