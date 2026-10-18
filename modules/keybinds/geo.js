@@ -143,11 +143,13 @@ const FRAMES = {
 };
 // the game's settings switches for frames, by layout.show key
 const TOGGLES = { swing: 'Swing Timer', meter: 'Damage Meter' };
-// the frames a class sees: all of them in Edit Mode (edit), otherwise not editOnly ones or toggle ones switched off (show)
+// the frames a class sees: toggle ones only when switched on (show), in Edit Mode too, like the game; editOnly ones
+// only in Edit Mode (edit)
 const framesFor = (cls, edit, show) => Object.keys(FRAMES).filter(k => {
   const f = FRAMES[k];
   if (f.classes && !f.classes.includes(cls)) return false;
-  return edit || (!f.editOnly && (!f.toggle || !!(show && show[f.toggle])));
+  if (f.toggle && !(show && show[f.toggle])) return false;
+  return edit || !f.editOnly;
 });
 // the Edit Mode presets a layout can start from; the bars sit the same in both, the unit frames don't
 const PRESETS = { modern: 'Modern', classic: 'Classic' };

@@ -47,7 +47,8 @@ function barRects(layout, cls, scr, withOff) {
 // opts: { page (bar 1 page), edit, selected (bar id), crop (just the bars, for practice and drill), screen (a SCREENS entry) }
 function screenHtml(layout, cls, opts = {}) {
   const scr = opts.screen ? screenSize(opts.screen.aspect, opts.screen.h) : screenSize();
-  const rects = barRects(layout, cls, scr, opts.edit);
+  // switched off is gone, in Edit Mode too, like the game: the bars and frames around close up
+  const rects = barRects(layout, cls, scr, false);
   let view = { l: 0, b: 0, w: scr.w, h: scr.h };
   if (opts.crop && rects.length) {
     const pad = 6, l = Math.min(...rects.map(r => r.rect.l)) - pad, b = Math.min(...rects.map(r => r.rect.b)) - pad;
