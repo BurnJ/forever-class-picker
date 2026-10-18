@@ -30,7 +30,7 @@ function newLayout(cls, spec) {
   EXTRA_BARS.forEach(b => { bars[b] = Array(SLOTS).fill(null); });
   const binds = {};
   DEFAULT_BAR1.forEach((k, i) => { binds['b1:' + i] = k; });
-  return { v: 2, cls, spec, name: '', mouse: 'keyboard', pages, bars, binds, mouseKeys: {}, geo: defaultGeo(), frames: {} };
+  return { v: 2, cls, spec, name: '', mouse: 'keyboard', pages, bars, binds, mouseKeys: {}, geo: defaultGeo(), frames: {}, preset: 'modern' };
 }
 // the bars the player shows (bar 1 always), in order
 const visibleBars = layout => ['b1', ...EXTRA_BARS.filter(b => layout.geo[b].vis !== 'hidden')];
@@ -70,7 +70,7 @@ const slotForBind = (layout, bind) => Object.keys(layout.binds).find(s => layout
 
 /* ---------- share codec ----------
    JSON with abilities stored as their rank-1 spell id (stable across data rebuilds), items as minus their
-   item id, then base64url. Version 2 adds bars 7-8, items, geometry and moved frames; version 1 links still open (with
+   item id, then base64url. Version 2 adds bars 7-8, items, geometry, moved frames and the Edit Mode preset (u); version 1 links still open (with
    the default geometry and their bar count). A link that doesn't decode gives { error } instead of a
    half-built layout. */
 const CODEC_VERSION = 2;
@@ -103,7 +103,7 @@ function unpackItems(arr, keyOf) {
 function encode(layout, spells) {
   const idOf = key => { const a = spells.abilities.find(x => x.key === key); return a && a.ranks[0].spell; };
   const o = { v: CODEC_VERSION, c: layout.cls, s: layout.spec, n: layout.name || '', m: layout.mouse,
-    p: {}, b: {}, k: layout.binds, mk: layout.mouseKeys, g: packGeo(layout.geo), f: packGeo(layout.frames || {}) };
+    p: {}, b: {}, k: layout.binds, mk: layout.mouseKeys, g: packGeo(layout.geo), f: packGeo(layout.frames || {}), u: layout.preset || 'modern' };
   for (const [page, arr] of Object.entries(layout.pages)) o.p[page] = packItems(arr, idOf);
   for (const [bar, arr] of Object.entries(layout.bars)) { const p = packItems(arr, idOf); if (p.length) o.b[bar] = p; }
   return b64url(JSON.stringify(o));
@@ -159,7 +159,7 @@ function decodeUnsafe(str, spellsByClass, mice) {
   if (o.v === 1) {  // bars 2..x+1 shown, the rest hidden
     const shown = Math.max(0, Math.min(5, +o.x || 0));
     EXTRA_BARS.forEach((b, i) => { layout.geo[b].vis = i < shown ? 'always' : 'hidden'; });
-  } else { layout.geo = unpackGeo(o.g); layout.frames = unpackFrames(o.f); }
+  } else { layout.geo = unpackGeo(o.g); layout.frames = unpackFrames(o.f); layout.preset = o.u === 'classic' ? 'classic' : 'modern'; }
   for (const page of Object.keys(layout.pages)) layout.pages[page] = unpackItems(o.p && o.p[page], keyOf);
   for (const bar of EXTRA_BARS) layout.bars[bar] = unpackItems(o.b && o.b[bar], keyOf);
   layout.binds = {};

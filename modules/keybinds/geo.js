@@ -101,13 +101,13 @@ function defaultGeo() {
 }
 
 // The game's other Edit Mode frames, which the planner can move but not reshape: Forever's Modern preset, sizes from
-// the probe's frame rects. system and index are the record's in the Edit Mode string (Enum.EditModeSystem, system index).
+// the probe's frame rects. `classic` is the frame's spot in the Classic preset when it differs (its string, editmode.js). system and index are the record's in the Edit Mode string (Enum.EditModeSystem, system index).
 // The player and target frames are pinned by their inner corners in game; these are the same spots from the centre.
 // The swing timers sit where the game puts them while in their default position (probe rects); the off hand
 // and ranged timers share a spot. `classes` limits a frame to the classes that can use it.
 const FRAMES = {
-  player: { name: 'Player', system: 3, index: 1, w: 232, h: 100, point: 'BOTTOM', x: -416, y: 250 },
-  target: { name: 'Target', system: 3, index: 2, w: 232, h: 100, point: 'BOTTOM', x: 416, y: 250 },
+  player: { name: 'Player', system: 3, index: 1, w: 232, h: 100, point: 'BOTTOM', x: -416, y: 250, classic: { point: 'TOPLEFT', x: 4, y: -4 } },
+  target: { name: 'Target', system: 3, index: 2, w: 232, h: 100, point: 'BOTTOM', x: 416, y: 250, classic: { point: 'TOPLEFT', x: 250, y: -4 } },
   minimap: { name: 'Minimap', system: 2, index: 0, w: 273, h: 283, point: 'TOPRIGHT', x: 0, y: 0 },
   chat: { name: 'Chat', system: 8, index: 0, w: 430, h: 170, point: 'BOTTOMLEFT', x: 35, y: 145 },
   buffs: { name: 'Buffs', system: 6, index: 1, w: 400, h: 135, point: 'TOPRIGHT', x: -255, y: -10 },
@@ -118,8 +118,12 @@ const FRAMES = {
   swingRanged: { name: 'Ranged swing', system: 29, index: 3, w: 426, h: 30, point: 'BOTTOM', x: 0, y: 231, classes: ['rogue', 'warrior', 'hunter'] },
 };
 const framesFor = cls => Object.keys(FRAMES).filter(k => !FRAMES[k].classes || FRAMES[k].classes.includes(cls));
-// where a frame is: moved (layout.frames) or the game's spot
-const framePos = (layout, key) => (layout.frames && layout.frames[key]) || FRAMES[key];
+// the Edit Mode presets a layout can start from; the bars sit the same in both, the unit frames don't
+const PRESETS = { modern: 'Modern', classic: 'Classic' };
+// where the game puts a frame in a preset
+const frameHome = (key, preset) => (preset === 'classic' && FRAMES[key].classic) || FRAMES[key];
+// where a frame is: moved (layout.frames) or the preset's spot
+const framePos = (layout, key) => (layout.frames && layout.frames[key]) || frameHome(key, layout.preset);
 
 // Keep a geometry record inside what Edit Mode allows (anything from a link is untrusted).
 function cleanGeo(g, dflt) {
@@ -139,4 +143,4 @@ function cleanGeo(g, dflt) {
 }
 
 if (typeof module !== 'undefined') module.exports = { SCREENS, BUTTON, ALL_BARS, VIS, screenSize, barSize, buttonPos,
-  pointFor, toAnchor, placeRect, fromAnchor, snap, defaultGeo, cleanGeo, FRAMES, framesFor, framePos };
+  pointFor, toAnchor, placeRect, fromAnchor, snap, defaultGeo, cleanGeo, FRAMES, framesFor, framePos, frameHome, PRESETS };

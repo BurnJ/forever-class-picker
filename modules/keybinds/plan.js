@@ -71,7 +71,9 @@ function renderPlan() {
           <button type="button" class="kb-toggle" data-act="bindmode" aria-pressed="${plan.bindMode}">Keybind mode</button>
           <button type="button" class="kb-toggle" data-act="editmode" aria-pressed="${plan.editMode}">Edit Mode</button>
           <span class="kb-hint">${hintText()}</span>
-          ${plan.editMode ? `<label class="kb-field kb-aspect">Screen <select id="kb-screen">${Object.keys(SCREENS).map(k => `<option value="${k}"${k === plan.screen ? ' selected' : ''}>${k.replace('x', ' × ')}</option>`).join('')}</select></label>` : ''}
+          ${plan.editMode ? `<label class="kb-field kb-aspect">Screen <select id="kb-screen">${Object.keys(SCREENS).map(k => `<option value="${k}"${k === plan.screen ? ' selected' : ''}>${k.replace('x', ' × ')}</option>`).join('')}</select></label>
+            <label class="kb-field kb-aspect">Preset <select id="kb-preset">${Object.entries(PRESETS).map(([k, n]) => `<option value="${k}"${k === (layout.preset || 'modern') ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+            <button type="button" class="kb-link" data-act="resetpos">Reset to preset</button>` : ''}
         </div>
         <div class="kb-screenwrap" id="kb-bars">${barsHtml()}</div>
         <div class="kb-actions">
@@ -314,6 +316,7 @@ function wirePlan() {
       else { const d = defaultGeo()[plan.selBar], g = plan.layout.geo[plan.selBar]; Object.assign(g, { point: d.point, x: d.x, y: d.y }); }
       planSave(); redrawScreen();
     }
+    else if (act === 'resetpos') { resetToPreset(); setMsg(`Bars and frames are back where ${PRESETS[plan.layout.preset || 'modern']} puts them.`); }
     else if (act === 'share') shareLink();
     else if (act === 'export') { plan.exportOpen = !plan.exportOpen; renderPlan(); }
     else if (act === 'copyem') copyText('kb-emstr', 'Copied. Paste it in Edit Mode → Import.');
@@ -345,6 +348,7 @@ function wirePlan() {
     if (e.target.id === 'kb-mouse') { plan.layout.mouse = e.target.value; plan.mouseCapture = null; change(); }
     if (e.target.id === 'kb-pick') { kbStore.set(`kb:cur:${plan.cls}/${plan.spec}`, e.target.value); planPage(plan.cls, plan.spec, new URLSearchParams()); }
     if (e.target.id === 'kb-itemcat') { plan.itemCat = e.target.value; plan.pageNo = 0; rerenderParts(); }
+    if (e.target.id === 'kb-preset') { plan.layout.preset = e.target.value; resetToPreset(); setMsg(`Started from ${PRESETS[plan.layout.preset]}. Your abilities and keys stay.`); }
     if (e.target.id === 'kb-screen') { plan.screen = e.target.value; kbStore.set('kb:screen', plan.screen); redrawScreen(); }
     if (e.target.dataset.gset === 'vertical' || e.target.dataset.gset === 'vis') setGeo(e.target);
   });
@@ -453,6 +457,15 @@ function wireBook() {
 }
 
 /* ---------- Edit Mode: move a bar, change its settings ---------- */
+// Every bar and frame back where the layout's Edit Mode preset puts them, the way picking a preset in game does.
+// Abilities, keys and which bars are shown stay.
+function resetToPreset() {
+  const home = defaultGeo();
+  for (const [id, g] of Object.entries(plan.layout.geo)) Object.assign(g, home[id], 'vis' in g ? { vis: g.vis } : {});
+  plan.layout.frames = {};
+  plan.selBar = null;
+  planSave(); redrawScreen();
+}
 function setGeo(input) {
   const g = plan.layout.geo[plan.selBar];
   if (!g) return;
